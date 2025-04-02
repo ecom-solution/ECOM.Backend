@@ -363,5 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Ignore all obj directories in any subdirectory
-**/obj/
-
+bin/
+obj/
+packages/
