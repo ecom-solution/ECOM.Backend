@@ -1,1 +1,4 @@
 ﻿/.vs
+
+# Ignore all obj directories in any subdirectory
+**/obj/
