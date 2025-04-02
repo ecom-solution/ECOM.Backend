@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ECOM.Domain.Entities.Main
+﻿namespace ECOM.Domain.Entities.Main
 {
-    internal class ApplicationClaim
+	public class ApplicationClaim : BaseEntity
     {
-    }
+        public ApplicationClaim() { }
+		public ApplicationClaim(string claimType, string claimValue) 
+		{
+			ClaimType = claimType;
+			ClaimValue = claimValue;
+		}
+
+		public string ClaimType { get; set; } = string.Empty;
+        public string ClaimValue { get; set;} = string.Empty;
+        public string? Description { get; set; }
+
+		public virtual ICollection<ApplicationRoleClaim>? RoleClaims { get; set; }
+	}
 }
