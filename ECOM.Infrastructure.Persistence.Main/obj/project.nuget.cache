@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "sgzTAsWyT519ffq5N7dc90Tn5UVKWHRxNeytk+Bz0zMHdN0pK6xmBJV8io6l8xRRg28VxqM6FzcAKL6Uj1+okg==",
+  "dgSpecHash": "TeIf6P48j38=",
   "success": true,
-  "projectFilePath": "C:\\Me\\Gits\\Projects\\ECOM.Backend\\ECOM.Infrastructure.Persistence.Main\\ECOM.Infrastructure.Persistence.Main.csproj",
+  "projectFilePath": "C:\\TTIN\\Source\\E-COM\\ECOM.Infrastructure.Persistence.Main\\ECOM.Infrastructure.Persistence.Main.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

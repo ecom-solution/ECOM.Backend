@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ECOM.Domain.Interfaces")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+be11e65802fc5d103722d926f7984971db86914c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+35307d06486f25e3107f686a4511fff2b663b1e4")]
 [assembly: System.Reflection.AssemblyProductAttribute("ECOM.Domain.Interfaces")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ECOM.Domain.Interfaces")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

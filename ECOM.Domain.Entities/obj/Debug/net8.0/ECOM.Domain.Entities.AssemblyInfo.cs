@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ECOM.Domain.Entities")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d1fc89ac00bfbcd1000353098d64cdfa5c5a9ef8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+35307d06486f25e3107f686a4511fff2b663b1e4")]
 [assembly: System.Reflection.AssemblyProductAttribute("ECOM.Domain.Entities")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ECOM.Domain.Entities")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "HUyrtl5lltsCzg1PNbxdUP2JTnHyyiHk3pYgi9HvwgI4gnBbOsBadvlvpYFMqv2JafAQzEZ3QEQ9XdYoOGYd0A==",
+  "dgSpecHash": "ndCoauMgBIs=",
   "success": true,
-  "projectFilePath": "C:\\Me\\Gits\\Projects\\ECOM.Backend\\ECOM.Domain.Interfaces\\ECOM.Domain.Interfaces.csproj",
+  "projectFilePath": "C:\\TTIN\\Source\\E-COM\\ECOM.Domain.Interfaces\\ECOM.Domain.Interfaces.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

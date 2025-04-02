@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "D9d+r5c45q+EIJQLBT93LTJ8K6cn7/vtzWeUhdemp2wn9SZiNvagVf91D7DOHgQRyJE+9UxwyZgo1sEXlZva/g==",
+  "dgSpecHash": "heRQtJ4H24c=",
   "success": true,
-  "projectFilePath": "C:\\Me\\Gits\\Projects\\ECOM.Backend\\ECOM.Domain.Entities\\ECOM.Domain.Entities.csproj",
+  "projectFilePath": "C:\\TTIN\\Source\\E-COM\\ECOM.Domain.Entities\\ECOM.Domain.Entities.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
