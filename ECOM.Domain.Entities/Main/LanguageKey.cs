@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ECOM.Domain.Entities.Main
+﻿namespace ECOM.Domain.Entities.Main
 {
-    internal class LanguageKey
+	public class LanguageKey : BaseEntity
     {
-    }
+		public LanguageKey() { }
+
+		public string Key { get; set; } = string.Empty;
+		public string? Description { get; set; }
+
+		public virtual ICollection<LanguageTranslation>? LanguageTranslations { get; set; }
+	}
 }

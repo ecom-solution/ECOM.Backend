@@ -1,12 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ECOM.Domain.Entities.Main
+﻿namespace ECOM.Domain.Entities.Main
 {
-    internal class ApplicationUserRole
+	public class ApplicationUserRole
     {
-    }
+		public ApplicationUserRole() { }
+
+		public ApplicationUserRole(Guid userId, Guid roleId)
+		{
+			UserId = userId;
+			RoleId = roleId;
+		}
+
+		public Guid UserId { get; set; }
+
+		public Guid RoleId { get; set; }
+
+		public virtual ApplicationUser? User { get; set; }
+		public virtual ApplicationRole? Role { get; set; }
+	}
 }

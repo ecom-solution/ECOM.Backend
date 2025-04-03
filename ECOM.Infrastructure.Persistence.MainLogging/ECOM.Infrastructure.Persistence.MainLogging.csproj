@@ -17,4 +17,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ECOM.Domain.Entities\ECOM.Domain.Entities.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -14,5 +14,6 @@
         public string? Description { get; set; }
 
 		public virtual ICollection<ApplicationRoleClaim>? RoleClaims { get; set; }
+		public virtual ICollection<ApplicationUserClaim>? UserClaims { get; set; }
 	}
 }

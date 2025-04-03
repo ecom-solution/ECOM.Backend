@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ECOM.Domain.Entities.Main
+namespace ECOM.Infrastructure.Logging.Targets
 {
-    internal class LanguageTranslationEntityContent
-    {
-    }
+	internal class DatabaseLoggingTarget
+	{
+	}
 }

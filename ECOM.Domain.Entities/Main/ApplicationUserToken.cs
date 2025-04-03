@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ECOM.Domain.Entities.Main
+﻿namespace ECOM.Domain.Entities.Main
 {
-    internal class ApplicationUserToken
+	public class ApplicationUserToken
     {
-    }
+		public Guid UserId { get; set; }
+
+		public string Provider { get; set; } = string.Empty;
+
+		public string TokenName { get; set; } = string.Empty;
+
+		public string TokenValue { get; set; } = string.Empty;
+
+		public virtual ApplicationUser? User { get; set; }
+	}
 }

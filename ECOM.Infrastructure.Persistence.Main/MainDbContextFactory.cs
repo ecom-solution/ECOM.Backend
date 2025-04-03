@@ -8,16 +8,10 @@ namespace ECOM.Infrastructure.Persistence.Main
 	{
 		public MainDbContext CreateDbContext(string[] args)
 		{
-			var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-			var configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory());
-
-			if (env == "Development")
-				configuration.AddJsonFile($"appsettings.{env}_{Environment.MachineName}.json", true, true);
-			else
-				configuration.AddJsonFile($"appsettings.{env}.json", true, true);
-
-			var configurationBuilder = configuration.Build();
+			var configurationBuilder = new ConfigurationBuilder()
+											.SetBasePath(Directory.GetCurrentDirectory())
+										    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", true, true)
+											.Build();
 
 			var connectionString = configurationBuilder.GetConnectionString(nameof(MainDbContext)) ?? string.Empty;
 

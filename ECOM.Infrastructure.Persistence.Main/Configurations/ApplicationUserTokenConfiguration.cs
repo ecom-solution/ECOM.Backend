@@ -1,0 +1,21 @@
+﻿using ECOM.Domain.Entities.Main;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace ECOM.Infrastructure.Persistence.Main.Configurations
+{
+	public class ApplicationUserTokenConfiguration : IEntityTypeConfiguration<ApplicationUserToken>
+	{
+		public void Configure(EntityTypeBuilder<ApplicationUserToken> builder)
+		{
+			builder.ToTable(nameof(ApplicationUserToken));
+
+			builder.HasKey(x => new { x.UserId, x.Provider, x.TokenName });
+			builder.Property(x => x.Provider).HasMaxLength(100).IsRequired();
+			builder.Property(x => x.TokenName).HasMaxLength(100).IsRequired();
+			builder.Property(x => x.TokenValue).HasMaxLength(int.MaxValue).IsRequired();
+
+			builder.HasOne(x => x.User).WithMany(x => x.UserTokens).HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+		}
+	}
+}
