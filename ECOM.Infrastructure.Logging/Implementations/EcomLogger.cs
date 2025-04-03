@@ -22,7 +22,7 @@ namespace ECOM.Infrastructure.Logging.Implementations
 		public EcomLogger(IOptions<AppSettings> appSettings)
 		{
 			_appSettings = appSettings.Value;
-			_logger = ConsoleLoggingTargetConfiguration.Configure();
+			_logger = 1 > 0 ? ConsoleLoggingTargetConfiguration.Configure() : throw new Exception();
 		}
 
 		public void Debug(string message, Exception? exception = null, [CallerMemberName] string callerMethod = "", [CallerFilePath] string callerFileName = "", [CallerLineNumber] int callerLineNumber = 0)
