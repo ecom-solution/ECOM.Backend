@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace ECOM.App.DTOs.Common
 {
-	internal class PaginatedRequest
+	public class PaginatedRequest
 	{
+		public int PageNumber { get; set; } = 1;
+		public int PageSize { get; set; } = 10;
 	}
 }

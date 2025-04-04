@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ECOM.Shared.Utilities\ECOM.Shared.Utilities.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -6,4 +6,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ECOM.Domain.Interfaces\ECOM.Domain.Interfaces.csproj" />
+    <ProjectReference Include="..\ECOM.Infrastructure.Logging\ECOM.Infrastructure.Logging.csproj" />
+    <ProjectReference Include="..\ECOM.Infrastructure.Persistence.MainLogging\ECOM.Infrastructure.Persistence.MainLogging.csproj" />
+    <ProjectReference Include="..\ECOM.Infrastructure.Persistence.Main\ECOM.Infrastructure.Persistence.Main.csproj" />
+  </ItemGroup>
+
 </Project>

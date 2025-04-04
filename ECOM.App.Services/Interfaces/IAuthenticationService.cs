@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ECOM.App.Services.Interfaces
 {
-    internal class IAuthenticationService
+    public interface IAuthenticationService
     {
     }
 }

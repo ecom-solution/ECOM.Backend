@@ -1,12 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ECOM.Shared.Utilities.Helpers;
 
 namespace ECOM.App.DTOs.Common
 {
-	internal class BaseDTO
+	public abstract class BaseDTO
 	{
+		public Guid Id { get; set; }
+		public Guid? CreatedBy { get; set; }
+		public DateTime CreatedAt_Utc { get; set; }
+
+		public Guid? LastUpdatedBy { get; set; }
+		public DateTime LastUpdatedAt_Utc { get; set; }
+
+		protected BaseDTO()
+		{
+			Id = GuidHelper.GenerateSequenceGuid();
+			CreatedAt_Utc = DateTime.UtcNow;
+			LastUpdatedAt_Utc = DateTime.UtcNow;
+		}
 	}
 }
