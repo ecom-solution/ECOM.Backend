@@ -5,7 +5,7 @@ namespace ECOM.Infrastructure.Logging.Targets
 {
 	public static class ConsoleLoggingTargetConfiguration
 	{
-		public static ILogger Configure()
+		public static ILogger Initialize()
 		{
 			return new LoggerConfiguration()
 			.WriteTo.Console(

@@ -1,61 +1,55 @@
 ﻿using ECOM.Infrastructure.Logging.Interfaces;
-using ECOM.Infrastructure.Logging.Targets;
 using ECOM.Shared.Utilities.Settings;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Context;
 using Serilog.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace ECOM.Infrastructure.Logging.Implementations
 {
-	public class EcomLogger : IEcomLogger
+	public class EcomLogger(
+		ILogger logger,
+		IOptions<AppSettings> appSettings,
+		IHttpContextAccessor httpContextAccessor) : IEcomLogger
 	{
-		private readonly ILogger _logger;
-		private readonly AppSettings _appSettings;
-
-		public EcomLogger(IOptions<AppSettings> appSettings)
-		{
-			_appSettings = appSettings.Value;
-			_logger = 1 > 0 ? ConsoleLoggingTargetConfiguration.Configure() : throw new Exception();
-		}
+		private readonly ILogger _logger = logger;
+		private readonly AppSettings _appSettings = appSettings.Value;
+		private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
 		public void Debug(string message, Exception? exception = null, [CallerMemberName] string callerMethod = "", [CallerFilePath] string callerFileName = "", [CallerLineNumber] int callerLineNumber = 0)
 		{
-			throw new NotImplementedException();
+			Log(LogEventLevel.Debug, message, exception, callerMethod, callerFileName, callerLineNumber);
 		}
 
 		public void Error(string message, Exception? exception = null, [CallerMemberName] string callerMethod = "", [CallerFilePath] string callerFileName = "", [CallerLineNumber] int callerLineNumber = 0)
 		{
-			throw new NotImplementedException();
+			Log(LogEventLevel.Error, message, exception, callerMethod, callerFileName, callerLineNumber);
 		}
 
 		public void Fatal(string message, Exception? exception = null, [CallerMemberName] string callerMethod = "", [CallerFilePath] string callerFileName = "", [CallerLineNumber] int callerLineNumber = 0)
 		{
-			throw new NotImplementedException();
+			Log(LogEventLevel.Fatal, message, exception, callerMethod, callerFileName, callerLineNumber);
 		}
 
 		public void Information(string message, Exception? exception = null, [CallerMemberName] string callerMethod = "", [CallerFilePath] string callerFileName = "", [CallerLineNumber] int callerLineNumber = 0)
 		{
-			throw new NotImplementedException();
+			Log(LogEventLevel.Information, message, exception, callerMethod, callerFileName, callerLineNumber);
 		}
 
 		public void Verbose(string message, Exception? exception = null, [CallerMemberName] string callerMethod = "", [CallerFilePath] string callerFileName = "", [CallerLineNumber] int callerLineNumber = 0)
 		{
-			throw new NotImplementedException();
+			Log(LogEventLevel.Verbose, message, exception, callerMethod, callerFileName, callerLineNumber);
 		}
 
 		public void Warning(string message, Exception? exception = null, [CallerMemberName] string callerMethod = "", [CallerFilePath] string callerFileName = "", [CallerLineNumber] int callerLineNumber = 0)
 		{
-			throw new NotImplementedException();
+			Log(LogEventLevel.Warning, message, exception, callerMethod, callerFileName, callerLineNumber);
 		}
 
-		private void Log(LogEventLevel level,string message, Exception? exception = null, [CallerMemberName] string callerMethod = "", [CallerFilePath] string callerFileName = "", [CallerLineNumber] int callerLineNumber = 0)
+		private void Log(LogEventLevel level, string message, Exception? exception = null, [CallerMemberName] string callerMethod = "", [CallerFilePath] string callerFileName = "", [CallerLineNumber] int callerLineNumber = 0)
 		{
 			// Push properties into the log context for automatic inclusion
 			using (LogContext.PushProperty("CallerMethod", callerMethod))
@@ -68,16 +62,22 @@ namespace ECOM.Infrastructure.Logging.Implementations
 				switch (level)
 				{
 					case LogEventLevel.Verbose:
+						_logger.Verbose(message, exception);
 						break;
 					case LogEventLevel.Debug:
+						_logger.Debug(message, exception);
 						break;
 					case LogEventLevel.Information:
+						_logger.Information(message, exception);
 						break;
 					case LogEventLevel.Warning:
+						_logger.Warning(message, exception);
 						break;
 					case LogEventLevel.Error:
+						_logger.Error(message, exception);
 						break;
 					case LogEventLevel.Fatal:
+						_logger.Fatal(message, exception);
 						break;
 					default:
 						break;
@@ -87,14 +87,26 @@ namespace ECOM.Infrastructure.Logging.Implementations
 
 		private string GetIpAddress()
 		{
-			// Example method to get IP address
-			return "127.0.0.1";
+			var context = _httpContextAccessor.HttpContext;
+			if (context?.Connection?.RemoteIpAddress != null)
+			{
+				return context.Connection.RemoteIpAddress.ToString();
+			}
+			return "Unknown";
 		}
 
 		private Guid? GetUserId()
 		{
-			// Example method to get user ID
-			return Guid.NewGuid();  // Replace with actual user ID logic
+			var context = _httpContextAccessor.HttpContext;
+			if (context?.User?.Identity?.IsAuthenticated == true)
+			{
+				var userIdClaim = context.User.FindFirst("sub") ?? context.User.FindFirst(ClaimTypes.NameIdentifier);
+				if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out Guid userId))
+				{
+					return userId;
+				}
+			}
+			return Guid.Empty;
 		}
 	}
 }

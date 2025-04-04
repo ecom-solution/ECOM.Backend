@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ECOM.Infrastructure.Persistence.Main;
+using ECOM.Infrastructure.Persistence.MainLogging;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -6,6 +9,14 @@ namespace ECOM.Infrastructure.Persistence.Extensions
 {
 	public static class DependencyExtensions
 	{
+		public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
+		{
+			services.AddDbContext<MainDbContext>(configuration);
+			services.AddDbContext<MainLoggingDbContext>(configuration);
+
+			return services;
+		}
+
 		public static IServiceCollection AddDbContext<TContext>(this IServiceCollection services, IConfiguration configuration) where TContext : DbContext
 		{
 			var contextName = typeof(TContext).Name;

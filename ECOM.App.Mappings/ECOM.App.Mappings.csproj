@@ -7,11 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ECOM.Shared.Utilities\ECOM.Shared.Utilities.csproj" />
+    <ProjectReference Include="..\ECOM.App.DTOs\ECOM.App.DTOs.csproj" />
+    <ProjectReference Include="..\ECOM.Domain.Entities\ECOM.Domain.Entities.csproj" />
   </ItemGroup>
 
 </Project>

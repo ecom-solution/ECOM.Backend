@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ECOM.Infrastructure.Logging.Targets
+namespace ECOM.App.DTOs.Common
 {
-	internal class DatabaseLoggingTarget
+	internal class Request
 	{
 	}
 }
