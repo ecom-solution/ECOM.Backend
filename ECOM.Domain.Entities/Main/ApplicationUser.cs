@@ -1,13 +1,7 @@
 ﻿using ECOM.Shared.Utilities.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace ECOM.Domain.Entities.Main
 {
-    public class ApplicationUser : AuditableEntity
+	public class ApplicationUser : AuditableEntity
     {
         public ApplicationUser() { }
 
@@ -40,6 +34,8 @@ namespace ECOM.Domain.Entities.Main
 		public string TimeZoneId { get; set; } = string.Empty;
 
 		public string Currency { get; set; } = string.Empty;
+
+		public string Language { get; set; } = string.Empty;
 
 		public bool TwoFactorEnabled { get; set; } = false;
 

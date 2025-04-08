@@ -8,9 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ECOM.App.DTOs\ECOM.App.DTOs.csproj" />
+    <ProjectReference Include="..\ECOM.App.Exceptions\ECOM.App.Exceptions.csproj" />
     <ProjectReference Include="..\ECOM.Domain.Interfaces\ECOM.Domain.Interfaces.csproj" />
     <ProjectReference Include="..\ECOM.Infrastructure.Logging\ECOM.Infrastructure.Logging.csproj" />
     <ProjectReference Include="..\ECOM.Infrastructure.Persistence.MainLogging\ECOM.Infrastructure.Persistence.MainLogging.csproj" />

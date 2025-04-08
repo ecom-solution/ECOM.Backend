@@ -21,4 +21,10 @@
     <ProjectReference Include="..\ECOM.Domain.Entities\ECOM.Domain.Entities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Seeds\ApplicationRole.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

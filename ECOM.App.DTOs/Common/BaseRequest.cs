@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace ECOM.App.DTOs.Common
 {
-	internal class Request
+	public class BaseRequest<TModel>
 	{
+		public required TModel Model { get; set; }
 	}
 }

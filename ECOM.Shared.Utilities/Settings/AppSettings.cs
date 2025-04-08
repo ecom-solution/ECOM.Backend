@@ -6,6 +6,7 @@
 		public DbContextSetting DbContext { get; set; } = new DbContextSetting();
 		public SmtpSetting Smtp { get; set; } = new SmtpSetting();
 		public StorageSetting Storage { get; set; } = new StorageSetting();
+		public LoggingSetting Logging { get; set; } = new LoggingSetting();
 
 		public class AuthenticationSetting
 		{

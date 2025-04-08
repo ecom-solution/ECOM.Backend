@@ -15,15 +15,6 @@
 		/// </param>
 		/// <returns>The number of state entries written to the database.</returns>
 		Task<int> SaveChangesAsync(CancellationToken cancellationToken = default, bool isPartOfTransaction = false);
-
-		/// <summary>
-		/// Saves multiple changes to the database in a bulk operation asynchronously.
-		/// Useful for performance optimization when working with large datasets.
-		/// </summary>
-		/// <param name="cancellationToken">A token to cancel the operation.</param>
-		/// <returns>The number of state entries written to the database.</returns>
-		Task<int> BulkSaveChangesAsync(CancellationToken cancellationToken = default);
-
 		#endregion
 
 		#region 🔹 Repository Access

@@ -14,6 +14,7 @@ namespace ECOM.Infrastructure.Persistence.Main.Configurations
 			builder.Property(x => x.Provider).HasMaxLength(100).IsRequired();
 			builder.Property(x => x.TokenName).HasMaxLength(100).IsRequired();
 			builder.Property(x => x.TokenValue).HasMaxLength(int.MaxValue).IsRequired();
+			builder.Property(x => x.TokenExpiredAt_Utc).IsRequired();
 
 			builder.HasOne(x => x.User).WithMany(x => x.UserTokens).HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
 		}

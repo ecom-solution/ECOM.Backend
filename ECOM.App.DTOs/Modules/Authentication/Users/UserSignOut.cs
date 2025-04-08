@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ECOM.App.DTOs.Modules.Authentication.Users
+﻿namespace ECOM.App.DTOs.Modules.Authentication.Users
 {
-	internal class UserSignOut
+	public class UserSignOut
 	{
+		public Guid Id { get; set; }
+		public string? RefreshToken { get; set; }
+	}
+
+	public class UserSignedOut
+	{
+		public Guid Id { get; set; }
+		public DateTime SignedOutAt_Utc { get; set; } = DateTime.UtcNow;
 	}
 }

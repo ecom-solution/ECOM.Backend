@@ -1,7 +1,7 @@
-﻿namespace ECOM.Domain.Entities.Main
+﻿namespace ECOM.App.DTOs.Modules.Authentication.Users
 {
-	public class ApplicationUserToken
-    {
+	public class UserToken
+	{
 		public Guid UserId { get; set; }
 
 		public string Provider { get; set; } = string.Empty;
@@ -11,7 +11,5 @@
 		public string TokenValue { get; set; } = string.Empty;
 
 		public DateTime TokenExpiredAt_Utc { get; set; }
-
-		public virtual ApplicationUser? User { get; set; }
 	}
 }

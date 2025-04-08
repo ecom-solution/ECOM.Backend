@@ -2,7 +2,6 @@
 using ECOM.Infrastructure.Persistence.Extensions;
 using ECOM.Shared.Utilities.Helpers;
 using ECOM.Shared.Utilities.Settings;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Reflection;
@@ -50,69 +49,6 @@ namespace ECOM.Infrastructure.Persistence.Implementations.Repositories
 				return 0;
 			}, TimeSpan.FromSeconds(_appSettings.DbContext.Retry.IntervalInSeconds), _appSettings.DbContext.Retry.MaxAttemptCount);
 		}
-
-		public async Task<int> BulkSaveChangesAsync(CancellationToken cancellationToken = default)
-		{
-			return await RetryHelper.RetryAsync(async () =>
-			{
-				var rowEffects = 0;
-				var isSaveChange = _dbContext.ChangeTracker.Entries().Any(x => x.State == EntityState.Added
-																			|| x.State == EntityState.Deleted
-																			|| x.State == EntityState.Modified);
-				if (isSaveChange)
-				{
-					if (_dbContext.Database.GetDbConnection() is SqlConnection connection)
-					{
-						if (connection.State != System.Data.ConnectionState.Open)
-							await connection.OpenAsync();
-
-						using var transaction = await connection.BeginTransactionAsync(cancellationToken) as SqlTransaction;
-						if (transaction != null)
-						{
-							try
-							{
-								var entities = _dbContext.GetEntities();
-								if (entities.Any())
-								{
-									foreach (var item in entities)
-									{
-										var insertedEntities = item.Value.insertedEntities;
-										if (insertedEntities != null && insertedEntities.Count != 0)
-										{
-											rowEffects += await _dbContext.BulkInsertEntitiesAsync(insertedEntities, connection, transaction, _appSettings.DbContext.Bulk.CmdTimeOutInMiliseconds, _appSettings.DbContext.Bulk.BatchSize);
-										}
-
-										var updatedEntities = item.Value.updatedEntities;
-										if (updatedEntities != null && updatedEntities.Count != 0)
-										{
-											rowEffects += await _dbContext.BulkUpdateEntitiesAsync(updatedEntities, connection, transaction, _appSettings.DbContext.Bulk.CmdTimeOutInMiliseconds, _appSettings.DbContext.Bulk.BatchSize);
-										}
-
-										var deletedEntities = item.Value.deletedEntities;
-										if (deletedEntities != null && deletedEntities.Count != 0)
-										{
-											rowEffects += await _dbContext.BulkDeleteEntitiesAsync(deletedEntities, connection, transaction, _appSettings.DbContext.Bulk.CmdTimeOutInMiliseconds, _appSettings.DbContext.Bulk.BatchSize);
-										}
-									}
-								}
-
-								await transaction.CommitAsync(cancellationToken);
-
-								_dbContext.DetachAllEntities();
-							}
-							catch (Exception)
-							{
-								await transaction.RollbackAsync(cancellationToken);
-								throw;
-							}
-
-						}
-					}
-				}
-				return rowEffects;
-			}, TimeSpan.FromSeconds(_appSettings.DbContext.Retry.IntervalInSeconds), _appSettings.DbContext.Retry.MaxAttemptCount);
-		}
-
 		#endregion
 
 		#region 🔹 Repository Access

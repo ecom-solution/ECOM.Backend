@@ -32,6 +32,7 @@ namespace ECOM.Infrastructure.Persistence.Main.Configurations
 
 			builder.Property(x => x.TimeZoneId).HasMaxLength(100).IsUnicode(false).IsRequired();
 			builder.Property(x => x.Currency).HasMaxLength(3).IsUnicode(false).IsRequired();
+			builder.Property(x => x.Language).HasMaxLength(2).IsUnicode(false).IsRequired();
 
 			builder.Property(x => x.TwoFactorEnabled).HasDefaultValue(false).IsRequired();
 			builder.Property(x => x.Status).IsRequired();
