@@ -1,5 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Data;
 
 namespace ECOM.Infrastructure.Persistence.Extensions
@@ -15,12 +17,26 @@ namespace ECOM.Infrastructure.Persistence.Extensions
 			if (connection.State != ConnectionState.Open)
 				await connection.OpenAsync();
 
-			using var transaction = connection.BeginTransaction();
+			var createdNewTransaction = false;
+			var transaction = context.Database.CurrentTransaction?.GetDbTransaction() as SqlTransaction;
+			if (transaction == null)
+			{
+				transaction = await connection.BeginTransactionAsync() as SqlTransaction ?? throw new Exception($"Can't create new transaction!");
+				createdNewTransaction = true;
+			}
 
 			try
 			{
-				var tableName = nameof(TEntity);
-				var tempTableName = $"#{tableName}_{Guid.NewGuid()}_Temp";
+				var entityType = context.Model.FindEntityType(typeof(TEntity))
+						?? throw new InvalidOperationException($"Entity {typeof(TEntity).Name} not found in DbContext metadata.");
+
+				var dbColumns = entityType.GetProperties()
+								  .Where(p => !p.IsShadowProperty())
+								  .Select(p => p.GetColumnName())
+								  .ToList() ?? [];
+
+				var tableName = typeof(TEntity).Name;
+				var tempTableName = $"#{tableName}_{Guid.NewGuid().ToString().Replace("-", string.Empty)}_Temp";
 
 				// Detect primary keys
 				var primaryKeys = GetPrimaryKeyColumns<TEntity>(context);
@@ -30,30 +46,39 @@ namespace ECOM.Infrastructure.Persistence.Extensions
 				// 1. Create temp table
 				await CreateTempTableAsync(connection, transaction, tableName, tempTableName);
 
-				// 2. Bulk copy into temp table
+				// 2. Build Data Table
+				var dataTable = ToDataTable(entities, dbColumns);
+
+				// 3. Bulk copy into temp table
 				using (var bulkCopy = new SqlBulkCopy(connection, SqlBulkCopyOptions.Default, transaction))
 				{
 					bulkCopy.DestinationTableName = tempTableName;
 					bulkCopy.BatchSize = batchSize;
 					bulkCopy.BulkCopyTimeout = commandTimeoutInMilliseconds;
 
-					using var dataTable = ToDataTable(entities);
+					foreach (var column in dbColumns)
+					{
+						bulkCopy.ColumnMappings.Add(column, column);
+					}
+
 					await bulkCopy.WriteToServerAsync(dataTable);
 				}
 
 				// 3. Merge temp table into main table
-				var mergeSql = GenerateMergeSql<TEntity>(tableName, tempTableName, primaryKeys);
+				var mergeSql = GenerateMergeSql<TEntity>(tableName, tempTableName, primaryKeys, dbColumns);
 
 				using (var command = new SqlCommand(mergeSql, connection, transaction))
 				{
 					await command.ExecuteNonQueryAsync();
 				}
 
-				await transaction.CommitAsync();
+				if (createdNewTransaction)
+					await transaction.CommitAsync();
 			}
 			catch
 			{
-				await transaction.RollbackAsync();
+				if (createdNewTransaction)
+					await transaction.RollbackAsync();
 				throw;
 			}
 		}
@@ -67,12 +92,20 @@ namespace ECOM.Infrastructure.Persistence.Extensions
 			if (connection.State != ConnectionState.Open)
 				await connection.OpenAsync();
 
-			using var transaction = connection.BeginTransaction();
+			var createdNewTransaction = false;
+			var transaction = context.Database.CurrentTransaction?.GetDbTransaction() as SqlTransaction;
+			if (transaction == null)
+			{
+				transaction = await connection.BeginTransactionAsync() as SqlTransaction ?? throw new Exception($"Can't create new transaction!");
+				createdNewTransaction = true;
+			}
 
 			try
 			{
-				var tableName = nameof(TEntity);
-				var tempTableName = $"#{tableName}_{Guid.NewGuid()}_Temp";
+				
+
+				var tableName = typeof(TEntity).Name;
+				var tempTableName = $"#{tableName}_{Guid.NewGuid().ToString().Replace("-", string.Empty)}_Temp";
 
 				var primaryKeys = GetPrimaryKeyColumns<TEntity>(context);
 				if (primaryKeys.Count == 0)
@@ -97,11 +130,13 @@ namespace ECOM.Infrastructure.Persistence.Extensions
 					await command.ExecuteNonQueryAsync();
 				}
 
-				await transaction.CommitAsync();
+				if (createdNewTransaction)
+					await transaction.CommitAsync();
 			}
 			catch
 			{
-				await transaction.RollbackAsync();
+				if (createdNewTransaction)
+					await transaction.RollbackAsync();
 				throw;
 			}
 		}
@@ -134,21 +169,16 @@ namespace ECOM.Infrastructure.Persistence.Extensions
 			return primaryKey.Properties.Select(p => p.Name).ToList();
 		}
 
-		private static string GenerateMergeSql<TEntity>(string mainTable, string tempTable, List<string> primaryKeys) where TEntity : class
+		private static string GenerateMergeSql<TEntity>(string mainTable, string tempTable, List<string> primaryKeys, List<string> dbColumns) where TEntity : class
 		{
-			var properties = typeof(TEntity).GetProperties()
-				.Where(p => p.CanRead && p.CanWrite)
-				.Select(p => p.Name)
-				.ToList();
-
 			var onCondition = string.Join(" AND ", primaryKeys.Select(pk => $"Target.{pk} = Source.{pk}"));
-			var updateSet = properties
+			var updateSet = dbColumns
 				.Where(p => !primaryKeys.Contains(p))
 				.Select(p => $"Target.{p} = Source.{p}")
 				.ToList();
 
-			var insertColumns = string.Join(", ", properties);
-			var insertValues = string.Join(", ", properties.Select(p => $"Source.{p}"));
+			var insertColumns = string.Join(", ", dbColumns);
+			var insertValues = string.Join(", ", dbColumns.Select(p => $"Source.{p}"));
 
 			return $@"
 					MERGE INTO {mainTable} AS Target
@@ -173,22 +203,22 @@ namespace ECOM.Infrastructure.Persistence.Extensions
 					ON {joinCondition};
 					";
 		}
-
-		private static DataTable ToDataTable<TEntity>(List<TEntity> entities)
+				
+		private static DataTable ToDataTable<TEntity>(List<TEntity> entities, List<string> dbColumns) where TEntity : class
 		{
 			var table = new DataTable();
-			var properties = typeof(TEntity).GetProperties()
-				.Where(p => p.CanRead && p.CanWrite)
+			var props = typeof(TEntity).GetProperties()
+				.Where(p => dbColumns.Contains(p.Name))
 				.ToList();
 
-			foreach (var prop in properties)
+			foreach (var prop in props)
 			{
 				table.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
 			}
 
 			foreach (var entity in entities)
 			{
-				var values = properties.Select(p => p.GetValue(entity) ?? DBNull.Value).ToArray();
+				var values = props.Select(p => p.GetValue(entity) ?? DBNull.Value).ToArray();
 				table.Rows.Add(values);
 			}
 

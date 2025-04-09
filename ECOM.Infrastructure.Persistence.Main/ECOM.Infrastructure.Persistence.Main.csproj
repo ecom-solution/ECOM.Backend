@@ -22,9 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Seeds\ApplicationRole.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+	<None Update="Seeds\\*.json">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
   </ItemGroup>
+
+  <Target Name="CopySeedFilesToApiBin" AfterTargets="Build">
+	 <Copy SourceFiles="@(None->'%(FullPath)')" DestinationFolder="$(SolutionDir)ECOM.Presentation.API\\bin\\$(Configuration)\\$(TargetFramework)\\ECOM.Infrastructure.Persistence.Main\\Seeds" SkipUnchangedFiles="true" />
+  </Target>
 
 </Project>

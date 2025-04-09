@@ -9,9 +9,9 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args); 
 
-builder.Configuration.AddEnvironmentVariables();
-
 builder.Configuration.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", true, true);
+
+builder.Configuration.AddEnvironmentVariables();
 
 // Configure Global AppSettings
 builder.Services.AddOptions<AppSettings>()
@@ -49,7 +49,8 @@ builder.Services.AddApplicationServices();
 
 var app = builder.Build();
 
-// Seed Data
+// Migrate Db & Seed Data
+await app.Services.MigrateAsync();
 await app.Services.SeedDatabaseAsync();
 
 // Enable Serilog request logging

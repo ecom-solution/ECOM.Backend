@@ -21,8 +21,6 @@ namespace ECOM.Infrastructure.Persistence.Implementations.Seeders
 		{
 			_logger.Information("Starting database seeding...");
 
-			await _mainUnitOfWork.GetContext().Database.MigrateAsync();
-
 			var sortedSeeders = seeders.OrderBy(s => s.Priority).ToList();
 
 			await using var transaction = await _mainUnitOfWork.GetContext().Database.BeginTransactionAsync();

@@ -21,7 +21,10 @@
     <ProjectReference Include="..\ECOM.App.Mappings\ECOM.App.Mappings.csproj" />
     <ProjectReference Include="..\ECOM.App.Services\ECOM.App.Services.csproj" />
     <ProjectReference Include="..\ECOM.Infrastructure.Logging\ECOM.Infrastructure.Logging.csproj" />
+    <ProjectReference Include="..\ECOM.Infrastructure.Persistence.MainLogging\ECOM.Infrastructure.Persistence.MainLogging.csproj" />
+    <ProjectReference Include="..\ECOM.Infrastructure.Persistence.Main\ECOM.Infrastructure.Persistence.Main.csproj" />
     <ProjectReference Include="..\ECOM.Infrastructure.Persistence\ECOM.Infrastructure.Persistence.csproj" />
+    <ProjectReference Include="..\ECOM.Shared.Utilities\ECOM.Shared.Utilities.csproj" />
   </ItemGroup>
 
 </Project>

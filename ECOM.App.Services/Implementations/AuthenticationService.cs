@@ -93,7 +93,7 @@ namespace ECOM.App.Services.Implementations
 			using var transaction = await _mainUnitOfWork.GetContext().Database.BeginTransactionAsync();
 			try
 			{
-
+				throw new Exception();
 			}
 			catch (Exception)
 			{

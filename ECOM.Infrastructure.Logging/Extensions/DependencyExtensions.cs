@@ -21,6 +21,7 @@ namespace ECOM.Infrastructure.Logging.Extensions
 				Log.Logger = DatabaseLoggingTargetConfiguration.Initialize(configuration);
 			}
 			builder.Host.UseSerilog();
+			builder.Services.AddSingleton(sp => Log.Logger);
 			builder.Services.AddSingleton<IEcomLogger, EcomLogger>();
 		}
 	}

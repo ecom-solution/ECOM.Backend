@@ -39,7 +39,8 @@ namespace ECOM.Infrastructure.Persistence.Implementations.Seeders
 		{
 			return new()
 			{
-				PropertyNameCaseInsensitive = true
+				PropertyNameCaseInsensitive = true,
+				WriteIndented = false
 			};
 		}
 	}

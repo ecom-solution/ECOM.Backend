@@ -21,4 +21,14 @@
     <ProjectReference Include="..\ECOM.Domain.Entities\ECOM.Domain.Entities.csproj" />
   </ItemGroup>
 
+    <ItemGroup>
+	    <None Update="Seeds\\*.json">
+		    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	    </None>
+    </ItemGroup>
+
+    <Target Name="CopySeedFilesToApiBin" AfterTargets="Build">
+	    <Copy SourceFiles="@(None->'%(FullPath)')" DestinationFolder="$(SolutionDir)ECOM.Presentation.API\\bin\\$(Configuration)\\$(TargetFramework)\\ECOM.Infrastructure.Persistence.Main\\Seeds" SkipUnchangedFiles="true" />
+    </Target>
+
 </Project>

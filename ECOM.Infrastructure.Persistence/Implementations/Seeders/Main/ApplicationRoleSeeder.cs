@@ -19,7 +19,8 @@ namespace ECOM.Infrastructure.Persistence.Implementations.Seeders.Main
 		{
 			_logger.Information($"Seeding ApplicationRoles");
 
-			var roles = await ReadAsync<ApplicationRole>("ECOM.Infrastructure.Persistence.Main\\Seeds\\ApplicationRole.json");
+			var relativePath = Path.Combine("ECOM.Infrastructure.Persistence.Main", "Seeds", "ApplicationRole.json");
+			var roles = await ReadAsync<ApplicationRole>(relativePath);
 
 			if (roles.Count > 0)
 			{

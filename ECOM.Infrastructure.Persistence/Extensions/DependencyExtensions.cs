@@ -16,8 +16,11 @@ namespace ECOM.Infrastructure.Persistence.Extensions
 	{
 		public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
 		{
-			services.AddDbContext<MainDbContext>(configuration);
-			services.AddDbContext<MainLoggingDbContext>(configuration);
+			services.AddDbContext<MainDbContext>(options =>
+				options.UseSqlServer(configuration.GetConnectionString(nameof(MainDbContext))));
+
+			services.AddDbContext<MainLoggingDbContext>(options =>
+				options.UseSqlServer(configuration.GetConnectionString(nameof(MainLoggingDbContext))));
 
 			services.AddScoped<IUnitOfWork<MainDbContext>, UnitOfWork<MainDbContext>>();
 			services.AddScoped<IUnitOfWork<MainLoggingDbContext>, UnitOfWork<MainLoggingDbContext>>();
@@ -37,6 +40,14 @@ namespace ECOM.Infrastructure.Persistence.Extensions
 				x => x.MigrationsAssembly(contextNamespace)));
 
 			return services;
+		}
+
+		public static async Task<IServiceProvider> MigrateAsync(this IServiceProvider service)
+		{
+			await service.MigrateAsync<MainDbContext>();
+			await service.MigrateAsync<MainLoggingDbContext>();
+
+			return service;
 		}
 
 		public static async Task<IServiceProvider> MigrateAsync<TContext>(this IServiceProvider service) where TContext : DbContext
@@ -87,10 +98,10 @@ namespace ECOM.Infrastructure.Persistence.Extensions
 		{
 			using (var scope = service.CreateScope())
 			{
-				var dbSeederModule = service.GetRequiredService<IDbSeederModule>();
+				var dbSeederModule = scope.ServiceProvider.GetRequiredService<IDbSeederModule>();
 				if (dbSeederModule != null)
 				{
-					var seeders = service.GetServices<IDbSeeder>();
+					var seeders = scope.ServiceProvider.GetServices<IDbSeeder>();
 					if (seeders != null && seeders.Any())
 					{
 						await dbSeederModule.InitializeAsync(seeders);
