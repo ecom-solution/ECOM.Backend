@@ -8,29 +8,22 @@ namespace ECOM.App.Services.Extensions
 	{
 		public static IServiceCollection AddApplicationServices(this IServiceCollection services)
 		{
-			var assembly = Assembly.GetAssembly(typeof(BaseService));
+			var assembly = Assembly.GetAssembly(typeof(BaseService)) ?? throw new InvalidOperationException("Cannot load assembly for BaseService.");
 
-			if (assembly != null)
+			var types = assembly.GetTypes()
+				.Where(t => t.IsClass && !t.IsAbstract && typeof(BaseService).IsAssignableFrom(t))
+				.ToList();
+
+			foreach (var implementationType in types)
 			{
-				var baseNamespace = typeof(BaseService).Namespace ?? string.Empty;
-
-				var types = assembly.GetTypes()
-									.Where(t => t.IsClass && !t.IsAbstract && t.Namespace != null && t.Namespace.StartsWith(baseNamespace))
-									.ToList();
-
-				foreach (var implementationType in types)
+				var interfaceType = implementationType.GetInterface($"I{implementationType.Name}");
+				if (interfaceType != null)
 				{
-					var interfaceType = implementationType.GetInterface($"I{implementationType.Name}");
-					if (interfaceType != null)
-					{
-						services.AddScoped(interfaceType, implementationType);
-					}
+					services.AddScoped(interfaceType, implementationType);
 				}
-
-				return services;
 			}
 
-			throw new InvalidOperationException("Cannot load assembly for BaseService.");
+			return services;
 		}
 	}
 }

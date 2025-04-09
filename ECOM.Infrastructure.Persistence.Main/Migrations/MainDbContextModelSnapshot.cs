@@ -369,6 +369,35 @@ namespace ECOM.Infrastructure.Persistence.Main.Migrations
                     b.ToTable("Language", (string)null);
                 });
 
+            modelBuilder.Entity("ECOM.Domain.Entities.Main.LanguageComponent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ComponentName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ComponentName")
+                        .IsUnique();
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("LanguageComponent", (string)null);
+                });
+
             modelBuilder.Entity("ECOM.Domain.Entities.Main.LanguageKey", b =>
                 {
                     b.Property<Guid>("Id")
@@ -376,15 +405,22 @@ namespace ECOM.Infrastructure.Persistence.Main.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Key")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("LanguageComponentId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.ToTable("LanguageKey");
+                    b.HasIndex("LanguageComponentId");
+
+                    b.ToTable("LanguageKey", (string)null);
                 });
 
             modelBuilder.Entity("ECOM.Domain.Entities.Main.LanguageTranslation", b =>
@@ -532,6 +568,26 @@ namespace ECOM.Infrastructure.Persistence.Main.Migrations
                     b.Navigation("Avatar");
                 });
 
+            modelBuilder.Entity("ECOM.Domain.Entities.Main.LanguageComponent", b =>
+                {
+                    b.HasOne("ECOM.Domain.Entities.Main.LanguageComponent", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId");
+
+                    b.Navigation("Parent");
+                });
+
+            modelBuilder.Entity("ECOM.Domain.Entities.Main.LanguageKey", b =>
+                {
+                    b.HasOne("ECOM.Domain.Entities.Main.LanguageComponent", "LanguageComponent")
+                        .WithMany("LanguageKeys")
+                        .HasForeignKey("LanguageComponentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LanguageComponent");
+                });
+
             modelBuilder.Entity("ECOM.Domain.Entities.Main.LanguageTranslation", b =>
                 {
                     b.HasOne("ECOM.Domain.Entities.Main.Language", "Language")
@@ -597,6 +653,13 @@ namespace ECOM.Infrastructure.Persistence.Main.Migrations
             modelBuilder.Entity("ECOM.Domain.Entities.Main.Language", b =>
                 {
                     b.Navigation("LanguageTranslations");
+                });
+
+            modelBuilder.Entity("ECOM.Domain.Entities.Main.LanguageComponent", b =>
+                {
+                    b.Navigation("Children");
+
+                    b.Navigation("LanguageKeys");
                 });
 
             modelBuilder.Entity("ECOM.Domain.Entities.Main.LanguageKey", b =>
