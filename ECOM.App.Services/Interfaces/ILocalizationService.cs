@@ -2,7 +2,7 @@
 
 namespace ECOM.App.Services.Interfaces
 {
-	public interface ILanguageService
+	public interface ILocalizationService
 	{
 		Task<string> GenerateLocalizationContentAsync(string languageCode, string rootComponent);
 	}

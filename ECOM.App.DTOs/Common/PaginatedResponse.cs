@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ECOM.App.DTOs.Common
+﻿namespace ECOM.App.DTOs.Common
 {
-	internal class PaginatedResponse
+	public class PaginatedResponse<TRecordModel>
 	{
+		public int TotalRecords { get; set; }
+		public int TotalPages { get; set; }
+		public int PageNumber { get; set; }
+		public int PageSize { get; set; }
+		public List<TRecordModel> Records { get; set; } = [];
 	}
 }

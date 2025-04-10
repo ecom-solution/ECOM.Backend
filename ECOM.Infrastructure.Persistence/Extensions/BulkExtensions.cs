@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Data;
 
@@ -102,8 +101,6 @@ namespace ECOM.Infrastructure.Persistence.Extensions
 
 			try
 			{
-				
-
 				var tableName = typeof(TEntity).Name;
 				var tempTableName = $"#{tableName}_{Guid.NewGuid().ToString().Replace("-", string.Empty)}_Temp";
 

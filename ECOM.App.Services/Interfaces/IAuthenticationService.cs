@@ -20,6 +20,13 @@ namespace ECOM.App.Services.Interfaces
 		Task<BaseResponse<UserSignedIn>> SignInAsync(BaseRequest<UserSignIn> request);
 
 		/// <summary>
+		/// Authenticates a admin user and generates an access token if credentials are valid.
+		/// </summary>
+		/// <param name="request">The sign-in request containing user login credentials.</param>
+		/// <returns>A response containing the signed-in admin user information and tokens if authentication is successful.</returns>
+		Task<BaseResponse<UserSignedIn>> AdminSignInAsync(BaseRequest<UserSignIn> request);
+
+		/// <summary>
 		/// Signs out a user by invalidating their session or refresh tokens.
 		/// </summary>
 		/// <param name="request">The sign-out request containing user sign-out information.</param>

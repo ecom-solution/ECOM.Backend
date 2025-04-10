@@ -14,13 +14,13 @@ using System.Text.Json;
 
 namespace ECOM.App.Services.Implementations
 {
-	public class LanguageService(
+	public class LocalizationService(
 		IMapper mapper,
 		IEcomLogger logger,
 		IOptions<AppSettings> appSettings,
 		IUnitOfWork<MainDbContext> mainUnitOfWork,
 		IUnitOfWork<MainLoggingDbContext> mainLoggingUnitOfWork)
-		: BaseService(mapper, logger, appSettings, mainUnitOfWork, mainLoggingUnitOfWork), ILanguageService
+		: BaseService(mapper, logger, appSettings, mainUnitOfWork, mainLoggingUnitOfWork), ILocalizationService
 	{		
 		public async Task<string> GenerateLocalizationContentAsync(string languageCode, string rootComponent)
 		{

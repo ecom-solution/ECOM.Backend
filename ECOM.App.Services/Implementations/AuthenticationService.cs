@@ -10,7 +10,9 @@ using ECOM.Infrastructure.Logging.Interfaces;
 using ECOM.Infrastructure.Persistence.Main;
 using ECOM.Infrastructure.Persistence.MainLogging;
 using ECOM.Shared.Utilities.Constants;
+using ECOM.Shared.Utilities.Enums;
 using ECOM.Shared.Utilities.Settings;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -58,8 +60,8 @@ namespace ECOM.App.Services.Implementations
 				await _mainUnitOfWork.Repository<ApplicationUser>().InsertAsync(user);
 				await _mainUnitOfWork.SaveChangesAsync(isPartOfTransaction: true);
 
-				//Add user to Default role
-				var defaultRole = await _mainUnitOfWork.Repository<ApplicationRole>().FirstOrDefaultAsync(x => x.Name == AuthenticationConstants.Role.Default) ?? throw new NotFoundException($"Default role not found!");
+				//Add user to Admin role // test
+				var defaultRole = await _mainUnitOfWork.Repository<ApplicationRole>().FirstOrDefaultAsync(x => x.Name == AuthenticationConstants.Role.Admin) ?? throw new NotFoundException($"Default role not found!");
 
 				var userRole = new ApplicationUserRole(user.Id, defaultRole.Id);
 				await _mainUnitOfWork.Repository<ApplicationUserRole>().InsertAsync(userRole);
@@ -89,6 +91,39 @@ namespace ECOM.App.Services.Implementations
 		}
 
 		public async Task<BaseResponse<UserSignedIn>> SignInAsync(BaseRequest<UserSignIn> request)
+		{
+			using var transaction = await _mainUnitOfWork.GetContext().Database.BeginTransactionAsync();
+			try
+			{
+				var userSignIn = request.Model;
+				var user = await _mainUnitOfWork.Repository<ApplicationUser>()
+											    .Where(x => string.Equals(x.UserName, userSignIn.UserName, StringComparison.OrdinalIgnoreCase)).FirstOrDefaultAsync()
+											     ?? throw new NotFoundException($"User {userSignIn.UserName} not found!");
+
+				if (!VerifyPassword(userSignIn.Password, user.PasswordHash))
+				{
+					HandleFailedLoginAttempt(user);
+
+					_mainUnitOfWork.Repository<ApplicationUser>().Update(user);
+					await _mainUnitOfWork.SaveChangesAsync(isPartOfTransaction: true);
+					await transaction.CommitAsync();
+
+					return BaseResponse<UserSignedIn>.Failure($"Password is incorrect!", statusCode: StatusCodes.Status401Unauthorized);
+				}
+				else
+				{
+					//re-migration
+					throw new Exception();
+				}
+			}
+			catch (Exception)
+			{
+				await transaction.RollbackAsync();
+				throw;
+			}
+		}
+
+		public async Task<BaseResponse<UserSignedIn>> AdminSignInAsync(BaseRequest<UserSignIn> request)
 		{
 			using var transaction = await _mainUnitOfWork.GetContext().Database.BeginTransactionAsync();
 			try
@@ -162,6 +197,24 @@ namespace ECOM.App.Services.Implementations
 			return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
 		}
 
+		private void HandleFailedLoginAttempt(ApplicationUser user)
+		{
+			if (user.Status == (int)UserStatus.Active || user.Status == (int)UserStatus.New)
+			{
+				if (user.AccessFailedCount >= _appSettings.Authentication.MaxAccessFailedCount)
+				{
+					user.AccessFailedCount = 0;
+					user.Status = (int)UserStatus.Inactive;
+					user.LockoutEndDate_Utc = DateTime.UtcNow.AddDays(_appSettings.Authentication.NumberOfDaysLocked);
+					user.LockedReason = $"User is locked due to failed login attempts!";
+				}
+				else
+				{
+					user.AccessFailedCount++;
+				}
+			}
+		}
+
 		private async Task<List<ApplicationRole>> GetAllRolesByUserId(Guid userId)
 		{
 			var userRoles = await _mainUnitOfWork.Repository<ApplicationUserRole>().Where(ur => ur.UserId == userId)
@@ -185,5 +238,6 @@ namespace ECOM.App.Services.Implementations
 								.ToListAsync() ?? [];
 			return userClaims;
 		}
+
 	}
 }

@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using ECOM.App.DTOs.Modules.Localization;
+using ECOM.Domain.Entities.Main;
 
 namespace ECOM.App.Mappings.Profiles
 {
-	internal class LanguageMappingProfile
+	public class LanguageMappingProfile : Profile
 	{
+		public LanguageMappingProfile()
+		{
+			CreateMap<LanguageComponent, LanguageComponentVM>().ReverseMap();
+			CreateMap<LanguageComponent, LanguageComponentRecordModel>().ReverseMap();
+		}
 	}
 }
