@@ -2,6 +2,7 @@ using ECOM.App.Mappings.Extensions;
 using ECOM.App.Services.Extensions;
 using ECOM.Infrastructure.Logging.Extensions;
 using ECOM.Infrastructure.Persistence.Extensions;
+using ECOM.Infrastructure.External.Services.Extensions;
 using ECOM.Presentation.API.Extensions;
 using ECOM.Presentation.API.Middlewares;
 using ECOM.Shared.Utilities.Settings;
@@ -41,6 +42,9 @@ builder.Services.AddMappingModule();
 
 //Add Persistence Module (Entity DbContext)
 builder.Services.AddPersistence(builder.Configuration);
+
+//Add External Module
+builder.Services.AddExternalModule();
 
 //Add Application Services Module
 builder.Services.AddApplicationServices();

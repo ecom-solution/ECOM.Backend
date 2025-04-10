@@ -5,11 +5,10 @@
 		public FileEntity() { }
 
 		public string FileName { get; set; } = string.Empty;
-		public string FilePath { get; set; } = string.Empty;
+		public string FileUrl { get; set; } = string.Empty;
 		public string ContentType { get; set; } = string.Empty;
 		public long FileSize { get; set; }
-		public string? StorageBucket { get; set; }
-		public bool IsPublic { get; set; } = false;
+		public string BucketName { get; set; } = string.Empty;
 
 		public virtual ICollection<ApplicationUser>? Users { get; set; }
 		public virtual ICollection<Language>? Languages { get; set; }

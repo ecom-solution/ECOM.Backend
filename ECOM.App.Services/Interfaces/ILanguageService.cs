@@ -4,6 +4,6 @@ namespace ECOM.App.Services.Interfaces
 {
 	public interface ILanguageService
 	{
-		Task<Dictionary<string, LanguageComponentFlatVM>> GetLanguageComponentChildrenFlatAsync(string languageCode, string parentComponentName);
+		Task<string> GenerateLocalizationContentAsync(string languageCode, string rootComponent);
 	}
 }
