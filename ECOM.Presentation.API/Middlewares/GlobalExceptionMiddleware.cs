@@ -31,7 +31,9 @@ namespace ECOM.Presentation.API.Middlewares
 
 		private static async Task HandleHttpStatusExceptionAsync(HttpContext context, HttpStatusException ex, JsonSerializerOptions options)
 		{
-			var response = BaseResponse<object>.Failure(
+			var response = new BaseResponse<object>();
+
+			response.Failure(
 				message: ex.Message,
 				statusCode: ex.StatusCode
 			);

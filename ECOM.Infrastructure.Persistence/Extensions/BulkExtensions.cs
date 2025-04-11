@@ -46,7 +46,7 @@ namespace ECOM.Infrastructure.Persistence.Extensions
 				await CreateTempTableAsync(connection, transaction, tableName, tempTableName);
 
 				// 2. Build Data Table
-				var dataTable = ToDataTable(entities, dbColumns);
+				var dataTable = ToDataTable(entities, dbColumns, context);
 
 				// 3. Bulk copy into temp table
 				using (var bulkCopy = new SqlBulkCopy(connection, SqlBulkCopyOptions.Default, transaction))
@@ -201,16 +201,29 @@ namespace ECOM.Infrastructure.Persistence.Extensions
 					";
 		}
 				
-		private static DataTable ToDataTable<TEntity>(List<TEntity> entities, List<string> dbColumns) where TEntity : class
+		private static DataTable ToDataTable<TEntity>(List<TEntity> entities, List<string> dbColumns, DbContext context) where TEntity : class
 		{
 			var table = new DataTable();
+			var entityType = context.Model.FindEntityType(typeof(TEntity));
 			var props = typeof(TEntity).GetProperties()
 				.Where(p => dbColumns.Contains(p.Name))
 				.ToList();
 
 			foreach (var prop in props)
 			{
-				table.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
+				var propertyType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
+				var column = table.Columns.Add(prop.Name, propertyType);
+
+				if (propertyType == typeof(string))
+				{
+					var dbProperty = entityType?.FindProperty(prop.Name);
+					if (dbProperty != null)
+					{
+						var maxLength = dbProperty.GetMaxLength();
+						if (maxLength.HasValue)
+							column.MaxLength = maxLength.Value;
+					}
+				}
 			}
 
 			foreach (var entity in entities)

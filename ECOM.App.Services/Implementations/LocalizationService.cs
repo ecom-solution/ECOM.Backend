@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
-using ECOM.App.DTOs.Modules.Localization;
 using ECOM.App.Services.Common;
 using ECOM.App.Services.Interfaces;
 using ECOM.Domain.Entities.Main;
 using ECOM.Domain.Interfaces.Repositories;
 using ECOM.Infrastructure.Logging.Interfaces;
 using ECOM.Infrastructure.Persistence.Main;
-using ECOM.Infrastructure.Persistence.MainLogging;
 using ECOM.Shared.Utilities.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -18,9 +16,8 @@ namespace ECOM.App.Services.Implementations
 		IMapper mapper,
 		IEcomLogger logger,
 		IOptions<AppSettings> appSettings,
-		IUnitOfWork<MainDbContext> mainUnitOfWork,
-		IUnitOfWork<MainLoggingDbContext> mainLoggingUnitOfWork)
-		: BaseService(mapper, logger, appSettings, mainUnitOfWork, mainLoggingUnitOfWork), ILocalizationService
+		IUnitOfWork<MainDbContext> mainUnitOfWork)
+		: BaseService(mapper, logger, appSettings, mainUnitOfWork), ILocalizationService
 	{		
 		public async Task<string> GenerateLocalizationContentAsync(string languageCode, string rootComponent)
 		{

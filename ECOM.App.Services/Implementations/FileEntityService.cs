@@ -6,7 +6,6 @@ using ECOM.Domain.Entities.Main;
 using ECOM.Domain.Interfaces.Repositories;
 using ECOM.Infrastructure.Logging.Interfaces;
 using ECOM.Infrastructure.Persistence.Main;
-using ECOM.Infrastructure.Persistence.MainLogging;
 using ECOM.Shared.Utilities.Settings;
 using Microsoft.Extensions.Options;
 
@@ -15,9 +14,8 @@ namespace ECOM.App.Services.Implementations
 	public class FileEntityService(
 		IMapper mapper, IEcomLogger logger,
 		IOptions<AppSettings> appSettings,
-		IUnitOfWork<MainDbContext> mainUnitOfWork,
-		IUnitOfWork<MainLoggingDbContext> mainLoggingUnitOfWork)
-		: BaseService(mapper, logger, appSettings, mainUnitOfWork, mainLoggingUnitOfWork), IFileEntityService
+		IUnitOfWork<MainDbContext> mainUnitOfWork)
+		: BaseService(mapper, logger, appSettings, mainUnitOfWork), IFileEntityService
 	{
 		public async Task InsertFileEntityAsync(UploadFileResult uploadFile)
 		{

@@ -8,7 +8,6 @@ using ECOM.Domain.Entities.Main;
 using ECOM.Domain.Interfaces.Repositories;
 using ECOM.Infrastructure.Logging.Interfaces;
 using ECOM.Infrastructure.Persistence.Main;
-using ECOM.Infrastructure.Persistence.MainLogging;
 using ECOM.Shared.Utilities.Constants;
 using ECOM.Shared.Utilities.Enums;
 using ECOM.Shared.Utilities.Settings;
@@ -16,6 +15,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using OtpNet;
+using QRCoder;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -24,32 +25,34 @@ using System.Text;
 
 namespace ECOM.App.Services.Implementations
 {
-	internal class AuthenticationService(
-		IMapper mapper, 
-		IEcomLogger logger, 
-		IOptions<AppSettings> appSettings, 
-		IUnitOfWork<MainDbContext> mainUnitOfWork, 
-		IUnitOfWork<MainLoggingDbContext> mainLoggingUnitOfWork) : BaseService(mapper, logger, appSettings, mainUnitOfWork, mainLoggingUnitOfWork), IAuthenticationService
+	public class AuthenticationService(
+		IMapper mapper,
+		IEcomLogger logger,
+		IOptions<AppSettings> appSettings,
+		IUnitOfWork<MainDbContext> mainUnitOfWork)
+		: BaseService(mapper, logger, appSettings, mainUnitOfWork), IAuthenticationService
 	{
 		public async Task<BaseResponse<UserSignedIn>> SignUpAsync(BaseRequest<UserSignUp> request)
 		{
 			using var transaction = await _mainUnitOfWork.GetContext().Database.BeginTransactionAsync();
 			try
 			{
+				var response = new BaseResponse<UserSignedIn>();
+
 				var userSignUp = request.Model;
 				if (string.IsNullOrWhiteSpace(userSignUp.UserName) || string.IsNullOrWhiteSpace(userSignUp.Password))
 					throw new BadRequestException($"UserName and Password are required.");
 
-				var existingUser = await _mainUnitOfWork.Repository<ApplicationUser>().Where(x => string.Equals(x.UserName, userSignUp.UserName, StringComparison.OrdinalIgnoreCase)).FirstOrDefaultAsync();
+				var existingUser = await _mainUnitOfWork.Repository<ApplicationUser>()
+														.FirstOrDefaultAsync(x => x.NormalizedUserName == userSignUp.UserName.ToUpper().Trim());
 				if (existingUser != null)
 					throw new BadRequestException($"UserName {userSignUp.UserName} is already registered.");
 
 				var user = new ApplicationUser()
 				{
 					UserName = userSignUp.UserName.Trim().ToLower(),
-					NormalizedUserName = userSignUp.UserName.Trim().ToLower(),
+					NormalizedUserName = userSignUp.UserName.Trim().ToUpper(),
 					PasswordHash = HashPassword(userSignUp.Password),
-					SecretKey = Guid.NewGuid().ToString(),
 					SecurityStamp = Guid.NewGuid().ToString(),
 					ConcurrencyStamp = Guid.NewGuid().ToString(),
 					TimeZoneId = string.IsNullOrWhiteSpace(userSignUp.TimeZoneId) ? ApplicationConstants.DefaultTimeZoneId : userSignUp.TimeZoneId,
@@ -58,30 +61,37 @@ namespace ECOM.App.Services.Implementations
 				};
 
 				await _mainUnitOfWork.Repository<ApplicationUser>().InsertAsync(user);
-				await _mainUnitOfWork.SaveChangesAsync(isPartOfTransaction: true);
+				await _mainUnitOfWork.SaveChangesAsync();
 
 				//Add user to Admin role // test
-				var defaultRole = await _mainUnitOfWork.Repository<ApplicationRole>().FirstOrDefaultAsync(x => x.Name == AuthenticationConstants.Role.Admin) ?? throw new NotFoundException($"Default role not found!");
+				var defaultRole = await _mainUnitOfWork.Repository<ApplicationRole>().FirstOrDefaultAsync(x => x.Name == AuthenticationConstants.Role.Admin)
+					?? throw new NotFoundException($"Default role not found!");
 
-				var userRole = new ApplicationUserRole(user.Id, defaultRole.Id);
+				var userRole = new ApplicationUserRole(user.Id, defaultRole.Id)
+				{
+					Role = defaultRole
+				};
 				await _mainUnitOfWork.Repository<ApplicationUserRole>().InsertAsync(userRole);
-				await _mainUnitOfWork.SaveChangesAsync(isPartOfTransaction: true);
 
-				var refreshToken = GenerateRefreshToken(user.Id);
-				await _mainUnitOfWork.Repository<ApplicationUserToken>().InsertAsync(refreshToken);
-				await _mainUnitOfWork.SaveChangesAsync(isPartOfTransaction: true);
+				await UpdateRefreshToken(user);
 
-				await transaction.CommitAsync();
+				await _mainUnitOfWork.SaveChangesAsync();
 
-				return BaseResponse<UserSignedIn>.Success(new UserSignedIn()
+				var accessToken = GenerateAccessToken(user, [defaultRole], []);
+
+				response.Successful(new UserSignedIn()
 				{
 					Id = user.Id,
 					UserName = user.UserName,
 					TimeZoneId = user.TimeZoneId,
 					Currency = user.Currency,
 					Language = user.Language,
-					AccessToken = GenerateAccessToken(user, [defaultRole], [])
+					AccessToken = accessToken ?? string.Empty
 				});
+
+				await transaction.CommitAsync();
+
+				return response;
 			}
 			catch (Exception)
 			{
@@ -92,57 +102,151 @@ namespace ECOM.App.Services.Implementations
 
 		public async Task<BaseResponse<UserSignedIn>> SignInAsync(BaseRequest<UserSignIn> request)
 		{
-			using var transaction = await _mainUnitOfWork.GetContext().Database.BeginTransactionAsync();
-			try
+			var isSaveChange = false;
+			var userSignIn = request.Model;
+			var response = new BaseResponse<UserSignedIn>();
+
+			var normalizedUserName = userSignIn.UserName.ToUpperInvariant().Trim();
+			var user = await _mainUnitOfWork.Repository<ApplicationUser>()
+											.FirstOrDefaultAsync(x => x.NormalizedUserName == normalizedUserName)
+												?? throw new NotFoundException($"User {userSignIn.UserName} not found!");
+
+			if (!VerifyPassword(userSignIn.Password, user.PasswordHash))
 			{
-				var userSignIn = request.Model;
-				var user = await _mainUnitOfWork.Repository<ApplicationUser>()
-											    .Where(x => string.Equals(x.UserName, userSignIn.UserName, StringComparison.OrdinalIgnoreCase)).FirstOrDefaultAsync()
-											     ?? throw new NotFoundException($"User {userSignIn.UserName} not found!");
-
-				if (!VerifyPassword(userSignIn.Password, user.PasswordHash))
-				{
-					HandleFailedLoginAttempt(user);
-
-					_mainUnitOfWork.Repository<ApplicationUser>().Update(user);
-					await _mainUnitOfWork.SaveChangesAsync(isPartOfTransaction: true);
-					await transaction.CommitAsync();
-
-					return BaseResponse<UserSignedIn>.Failure($"Password is incorrect!", statusCode: StatusCodes.Status401Unauthorized);
-				}
-				else
-				{
-					//re-migration
-					throw new Exception();
-				}
+				await HandleFailedSignInAttemptAsync(user);
 			}
-			catch (Exception)
+
+			isSaveChange |= HandleCheckUserStatus(user);
+
+			var isAdmin = await IsAdminUserAsync(user);
+			if (isAdmin)
 			{
-				await transaction.RollbackAsync();
-				throw;
+				isSaveChange |= await HandleAdminLoginAsync(user, response);
 			}
+			else
+			{
+				isSaveChange |= await HandleNormalUserLoginAsync(user, response);
+			}
+
+			if (isSaveChange)
+				await _mainUnitOfWork.SaveChangesAsync();
+
+			return response;
 		}
 
 		public async Task<BaseResponse<UserSignedIn>> AdminSignInAsync(BaseRequest<UserSignIn> request)
 		{
-			using var transaction = await _mainUnitOfWork.GetContext().Database.BeginTransactionAsync();
-			try
+
+			var isSaveChange = false;
+			var userSignIn = request.Model;
+			var response = new BaseResponse<UserSignedIn>();
+
+			var normalizedUserName = userSignIn.UserName.ToUpperInvariant().Trim();
+			var user = await _mainUnitOfWork.Repository<ApplicationUser>()
+											.FirstOrDefaultAsync(x => x.NormalizedUserName == normalizedUserName)
+												?? throw new NotFoundException($"User {userSignIn.UserName} not found!");
+
+			if (!VerifyPassword(userSignIn.Password, user.PasswordHash))
 			{
-				throw new Exception();
+				await HandleFailedSignInAttemptAsync(user);
 			}
-			catch (Exception)
-			{
-				await transaction.RollbackAsync();
-				throw;
-			}
+
+			var isAdmin = await IsAdminUserAsync(user);
+			if (!isAdmin)
+				throw new UnauthorizedException($"User {userSignIn.UserName} is not an admin user!");
+
+			isSaveChange |= HandleCheckUserStatus(user);
+
+			isSaveChange |= await HandleAdminLoginAsync(user, response);
+
+			if (isSaveChange)
+				await _mainUnitOfWork.SaveChangesAsync();
+
+			return response;
 		}
 
-		public Task<BaseResponse<UserSignedOut>> SignOutAsync(BaseRequest<UserSignedOut> request)
+		public async Task<BaseResponse<UserSignedIn>> AdminVerifyOtpAsync(BaseRequest<UserVerifyOtp> request)
 		{
-			throw new NotImplementedException();
+			var isSaveChange = false;
+			var response = new BaseResponse<UserSignedIn>();
+
+			var userSignIn = request.Model;
+			var user = await _mainUnitOfWork.Repository<ApplicationUser>()
+											.Where(x => x.NormalizedUserName == userSignIn.UserName.ToUpper().Trim() && x.SecretKey == userSignIn.SecretKey).FirstOrDefaultAsync()
+											 ?? throw new NotFoundException($"User {userSignIn.UserName} not found!");
+
+			var totp = new Totp(Base32Encoding.ToBytes(user.SecretKey));
+			var isValid = totp.VerifyTotp(userSignIn.OtpCode, out long _);
+			if (isValid)
+			{
+				await UpdateRefreshToken(user);
+				isSaveChange = true;
+
+				var roles = await GetAllRolesByUserId(user.Id);
+				var claims = await GetAllClaimsByUserId(user.Id);
+				var accessToken = GenerateAccessToken(user, roles, claims);
+
+				response.Successful(new UserSignedIn
+				{
+					Id = user.Id,
+					UserName = user.UserName,
+					TimeZoneId = user.TimeZoneId,
+					Currency = user.Currency,
+					Language = user.Language,
+					AccessToken = accessToken
+				});
+			}
+			else
+			{
+				user.VerifyFailedCount = (user.VerifyFailedCount ?? 0) + 1;
+
+				if (user.VerifyFailedCount >= _appSettings.Authentication.MaxVerifyFailedCount)
+				{
+					user.Status = (int)UserStatus.Inactive;
+					user.LockoutEndDate_Utc = DateTime.UtcNow.AddDays(_appSettings.Authentication.NumberOfDaysLocked);
+					user.LockedReason = "Exceeded failed verify otp attempts";
+
+					response.Failure($"OTP {userSignIn.OtpCode} incorrect!", statusCode: StatusCodes.Status423Locked);
+				}
+				else
+				{
+					response.Failure($"OTP {userSignIn.OtpCode} incorrect!", statusCode: StatusCodes.Status401Unauthorized);
+				}
+
+				isSaveChange = true;
+			}
+
+			if (isSaveChange)
+				await _mainUnitOfWork.SaveChangesAsync();
+
+			return response;
+		}
+
+		public async Task<BaseResponse<UserSignedOut>> SignOutAsync(BaseRequest<UserSignOut> request)
+		{
+			var response = new BaseResponse<UserSignedOut>();
+			var userSignOut = request.Model;
+			var token = await _mainUnitOfWork.Repository<ApplicationUserToken>()
+											 .FirstOrDefaultAsync(t => t.UserId == userSignOut.Id &&
+																	   t.Provider == ApplicationConstants.AppName &&
+																	   t.TokenName == ApplicationConstants.RefreshToken);
+
+			if (token != null)
+			{
+				_mainUnitOfWork.Repository<ApplicationUserToken>().Delete(token);
+				await _mainUnitOfWork.SaveChangesAsync();
+			}
+
+			response.Successful(new UserSignedOut
+			{
+				Id = userSignOut.Id
+			});
+
+			return response;
 		}
 
 		//---------------------------------------------------------------------------------------------------------------------
+
 		private string GenerateAccessToken(ApplicationUser user, List<ApplicationRole> roles, List<ApplicationClaim> claims)
 		{
 			var jwtSettings = _appSettings.Authentication.Jwt;
@@ -171,20 +275,43 @@ namespace ECOM.App.Services.Implementations
 			return new JwtSecurityTokenHandler().WriteToken(token);
 		}
 
-		private ApplicationUserToken GenerateRefreshToken(Guid userId)
+		private async Task UpdateRefreshToken(ApplicationUser user)
 		{
-			var randomNumber = new byte[64];
-			using var rng = RandomNumberGenerator.Create();
-			rng.GetBytes(randomNumber);
+			var existToken = await _mainUnitOfWork.Repository<ApplicationUserToken>().FirstOrDefaultAsync(x => x.UserId == user.Id && x.Provider == ApplicationConstants.AppName && x.TokenName == ApplicationConstants.RefreshToken);
+			if (existToken == null)
+			{
+				var refreshToken = CreateNewRefreshToken(user.Id);
+				await _mainUnitOfWork.Repository<ApplicationUserToken>().InsertAsync(refreshToken);
+			}
+			else
+			{
+				existToken.TokenValue = GenerateNewRefreshToken();
+				existToken.TokenExpiredAt_Utc = DateTime.UtcNow.AddDays(_appSettings.Authentication.Jwt.RefreshTokenValidityInDays);
+
+				_mainUnitOfWork.Repository<ApplicationUserToken>().Update(existToken);
+			}
+		}
+
+		private ApplicationUserToken CreateNewRefreshToken(Guid userId)
+		{
+			var token = GenerateNewRefreshToken();
 
 			return new ApplicationUserToken()
 			{
 				UserId = userId,
 				Provider = ApplicationConstants.AppName,
-				TokenName = "RefressToken",
-				TokenValue = Convert.ToBase64String(randomNumber),
+				TokenName = ApplicationConstants.RefreshToken,
+				TokenValue = token,
 				TokenExpiredAt_Utc = DateTime.UtcNow.AddDays(_appSettings.Authentication.Jwt.RefreshTokenValidityInDays)
 			};
+		}
+
+		private static string GenerateNewRefreshToken()
+		{
+			var randomNumber = new byte[64];
+			using var rng = RandomNumberGenerator.Create();
+			rng.GetBytes(randomNumber);
+			return Convert.ToBase64String(randomNumber);
 		}
 
 		private static string HashPassword(string password)
@@ -195,24 +322,6 @@ namespace ECOM.App.Services.Implementations
 		private static bool VerifyPassword(string password, string hashedPassword)
 		{
 			return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
-		}
-
-		private void HandleFailedLoginAttempt(ApplicationUser user)
-		{
-			if (user.Status == (int)UserStatus.Active || user.Status == (int)UserStatus.New)
-			{
-				if (user.AccessFailedCount >= _appSettings.Authentication.MaxAccessFailedCount)
-				{
-					user.AccessFailedCount = 0;
-					user.Status = (int)UserStatus.Inactive;
-					user.LockoutEndDate_Utc = DateTime.UtcNow.AddDays(_appSettings.Authentication.NumberOfDaysLocked);
-					user.LockedReason = $"User is locked due to failed login attempts!";
-				}
-				else
-				{
-					user.AccessFailedCount++;
-				}
-			}
 		}
 
 		private async Task<List<ApplicationRole>> GetAllRolesByUserId(Guid userId)
@@ -239,5 +348,144 @@ namespace ECOM.App.Services.Implementations
 			return userClaims;
 		}
 
+		private static string GenerateQRCodeUri(ApplicationUser user)
+		{
+			user.SecretKey = Base32Encoding.ToString(KeyGeneration.GenerateRandomKey(20));
+
+			var otpAuthUrl = $"otpauth://totp/{ApplicationConstants.AppName}:{user.UserName}?secret={user.SecretKey}&issuer={ApplicationConstants.AppName}&algorithm=SHA1&digits=6&period=30";
+			var qrGenerator = new QRCodeGenerator();
+			var qrCodeData = qrGenerator.CreateQrCode(otpAuthUrl, QRCodeGenerator.ECCLevel.Q);
+			var qrCode = new PngByteQRCode(qrCodeData);
+			var qrCodeBytes = qrCode.GetGraphic(20);
+			return Convert.ToBase64String(qrCodeBytes);
+		}
+
+		private async Task<bool> IsAdminUserAsync(ApplicationUser user)
+		{
+			return await _mainUnitOfWork.Repository<ApplicationUserRole>()
+										.Where(ur => ur.UserId == user.Id)
+										.Include(ur => ur.Role)
+										.AnyAsync(ur => ur.Role != null && ur.Role.Name == AuthenticationConstants.Role.Admin);
+		}
+
+		private static bool HandleCheckUserStatus(ApplicationUser user)
+		{
+			var isSaveChange = false;
+			if (user.Status == (int)UserStatus.Inactive)
+			{
+				if (user.LockoutEndDate_Utc.HasValue && user.LockoutEndDate_Utc.Value > DateTime.UtcNow)
+				{
+					throw new UnauthorizedException($"User is currently locked: {user.LockedReason}");
+				}
+
+				// Unlock user if lock expired
+				user.Status = (int)UserStatus.Active;
+				user.AccessFailedCount = 0;
+				user.VerifyFailedCount = 0;
+				user.LockoutEndDate_Utc = null;
+				isSaveChange = true;
+			}
+			else if (user.Status is not ((int)UserStatus.New or (int)UserStatus.Active))
+			{
+				throw new UnauthorizedException($"Invalid user status!");
+			}
+			return isSaveChange;
+		}
+
+		private async Task<bool> HandleNormalUserLoginAsync(ApplicationUser user, BaseResponse<UserSignedIn> response)
+		{
+			var isSaveChange = false;
+			if (user.TwoFactorEnabled && (user.EmailConfirmed || user.PhoneNumberConfirmed))
+			{
+				if (!string.IsNullOrWhiteSpace(user.Email) && user.EmailConfirmed)
+				{
+					// TODO: Implement send OTP via Email
+				}
+				else
+				{
+					// TODO: Implement send OTP via SMS
+				}
+			}
+			else
+			{
+				await CompleteSignInAsync(user, response);
+				isSaveChange = true; // Save new refresh token
+			}
+			return isSaveChange;
+		}
+
+		private async Task<bool> HandleAdminLoginAsync(ApplicationUser user, BaseResponse<UserSignedIn> response)
+		{
+			var isSaveChange = false;
+			if (user.TwoFactorEnabled)
+			{
+				if (string.IsNullOrEmpty(user.SecretKey))
+				{
+					var qrCodeUrl = GenerateQRCodeUri(user);
+
+					response.Successful(new UserSignedIn
+					{
+						TwoFactorEnabled = true,
+						SecretKey = user.SecretKey,
+						QRCodeUri = qrCodeUrl
+					});
+
+					isSaveChange = true; // Save SecretKey
+				}
+				else
+				{
+					response.Successful(new UserSignedIn
+					{
+						TwoFactorEnabled = true,
+						SecretKey = user.SecretKey
+					});
+				}
+			}
+			else
+			{
+				await CompleteSignInAsync(user, response);
+				isSaveChange = true; // Save new refresh token
+			}
+			return isSaveChange;
+		}
+
+		private async Task CompleteSignInAsync(ApplicationUser user, BaseResponse<UserSignedIn> response)
+		{
+			await UpdateRefreshToken(user);
+
+			var roles = await GetAllRolesByUserId(user.Id);
+			var claims = await GetAllClaimsByUserId(user.Id);
+
+			var accessToken = GenerateAccessToken(user, roles, claims);
+
+			response.Successful(new UserSignedIn
+			{
+				Id = user.Id,
+				UserName = user.UserName,
+				TimeZoneId = user.TimeZoneId,
+				Currency = user.Currency,
+				Language = user.Language,
+				AccessToken = accessToken
+			});
+		}
+
+		private async Task HandleFailedSignInAttemptAsync(ApplicationUser user)
+		{
+			if (user.Status == (int)UserStatus.New || user.Status == (int)UserStatus.Active)
+			{
+				user.AccessFailedCount = (user.AccessFailedCount ?? 0) + 1;
+
+				if (user.AccessFailedCount >= _appSettings.Authentication.MaxAccessFailedCount)
+				{
+					user.Status = (int)UserStatus.Inactive;
+					user.LockoutEndDate_Utc = DateTime.UtcNow.AddDays(_appSettings.Authentication.NumberOfDaysLocked);
+					user.LockedReason = "Exceeded failed login attempts";
+				}
+
+				await _mainUnitOfWork.SaveChangesAsync();
+			}
+
+			throw new UnauthorizedException($"Invalid password!");
+		}
 	}
 }

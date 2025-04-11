@@ -17,37 +17,9 @@ namespace ECOM.Infrastructure.Persistence.Implementations.Repositories
 
 		#region 🔹 Save Changes
 
-		public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default, bool isPartOfTransaction = false)
+		public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
 		{
-			return await RetryHelper.RetryAsync(async () =>
-			{
-				var isSaveChange = _dbContext.ChangeTracker.Entries().Any(x => x.State == EntityState.Added
-																			|| x.State == EntityState.Deleted
-																			|| x.State == EntityState.Modified);
-				if (isSaveChange)
-				{
-					if (isPartOfTransaction)
-					{
-						return await _dbContext.SaveChangesAsync(cancellationToken);
-					}
-					using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
-					try
-					{
-						var result = await _dbContext.SaveChangesAsync(cancellationToken);
-						await transaction.CommitAsync(cancellationToken);
-
-						_dbContext.DetachAllEntities();
-
-						return result;
-					}
-					catch (Exception)
-					{
-						await transaction.RollbackAsync(cancellationToken);
-						throw;
-					}
-				}
-				return 0;
-			}, TimeSpan.FromSeconds(_appSettings.DbContext.Retry.IntervalInSeconds), _appSettings.DbContext.Retry.MaxAttemptCount);
+			return await _dbContext.SaveChangesAsync(cancellationToken);
 		}
 		#endregion
 

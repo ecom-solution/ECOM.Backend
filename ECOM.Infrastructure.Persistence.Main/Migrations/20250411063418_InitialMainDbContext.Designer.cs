@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ECOM.Infrastructure.Persistence.Main.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20250410070317_InitialMainDbContext")]
+    [Migration("20250411063418_InitialMainDbContext")]
     partial class InitialMainDbContext
     {
         /// <inheritdoc />
@@ -354,18 +354,21 @@ namespace ECOM.Infrastructure.Persistence.Main.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasMaxLength(5)
+                        .HasMaxLength(2)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(5)");
+                        .HasColumnType("varchar(2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AvatarId");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
 
                     b.ToTable("Language", (string)null);
                 });

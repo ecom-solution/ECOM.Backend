@@ -27,10 +27,24 @@ namespace ECOM.App.Services.Interfaces
 		Task<BaseResponse<UserSignedIn>> AdminSignInAsync(BaseRequest<UserSignIn> request);
 
 		/// <summary>
+		/// Verifies the OTP (One-Time Password) provided by the admin user during the two-factor authentication (2FA) login process.
+		/// </summary>
+		/// <param name="request">Request containing username, secret key, and OTP code to verify.</param>
+		/// <returns>
+		/// Returns a <see cref="BaseResponse{UserSignedIn}"/>:
+		/// - Success: If the OTP is valid, generates a new refresh token, access token, and returns user information.
+		/// - Failure: If the OTP is invalid, increments failed attempt counters, locks the account if necessary, and returns an error.
+		/// </returns>
+		/// <remarks>
+		/// If the number of failed OTP attempts exceeds the configured limit, the user account will be locked for a predefined period.
+		/// </remarks>
+		Task<BaseResponse<UserSignedIn>> AdminVerifyOtpAsync(BaseRequest<UserVerifyOtp> request);
+
+		/// <summary>
 		/// Signs out a user by invalidating their session or refresh tokens.
 		/// </summary>
 		/// <param name="request">The sign-out request containing user sign-out information.</param>
 		/// <returns>A response confirming that the user has successfully signed out.</returns>
-		Task<BaseResponse<UserSignedOut>> SignOutAsync(BaseRequest<UserSignedOut> request);
+		Task<BaseResponse<UserSignedOut>> SignOutAsync(BaseRequest<UserSignOut> request);
 	}
 }

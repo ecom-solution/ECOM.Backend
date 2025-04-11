@@ -12,13 +12,11 @@ namespace ECOM.App.Services.Common
 		IMapper mapper,
 		IEcomLogger logger,
 		IOptions<AppSettings> appSettings,
-		IUnitOfWork<MainDbContext> mainUnitOfWork,
-		IUnitOfWork<MainLoggingDbContext> mainLoggingUnitOfWork)
+		IUnitOfWork<MainDbContext> mainUnitOfWork)
 	{
 		protected readonly IMapper _mapper = mapper;
 		protected readonly IEcomLogger _logger = logger;
 		protected readonly AppSettings _appSettings = appSettings.Value;
 		protected readonly IUnitOfWork<MainDbContext> _mainUnitOfWork = mainUnitOfWork;
-		protected readonly IUnitOfWork<MainLoggingDbContext> _mainLoggingUnitOfWork = mainLoggingUnitOfWork;
 	}
 }

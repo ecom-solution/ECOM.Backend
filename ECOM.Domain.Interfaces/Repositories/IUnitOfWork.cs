@@ -6,15 +6,10 @@
 
 		/// <summary>
 		/// Saves all changes made in the current unit of work asynchronously.
-		/// If the operation is inside an existing transaction, it will not commit the transaction.
 		/// </summary>
 		/// <param name="cancellationToken">A token to cancel the operation.</param>
-		/// <param name="isPartOfTransaction">
-		/// Indicates whether this save operation is part of an already opened transaction.
-		/// If <c>true</c>, changes will be saved but not committed.
-		/// </param>
 		/// <returns>The number of state entries written to the database.</returns>
-		Task<int> SaveChangesAsync(CancellationToken cancellationToken = default, bool isPartOfTransaction = false);
+		Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 		#endregion
 
 		#region 🔹 Repository Access

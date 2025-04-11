@@ -151,8 +151,8 @@ namespace ECOM.Infrastructure.Persistence.Main.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Code = table.Column<string>(type: "varchar(5)", unicode: false, maxLength: 5, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Code = table.Column<string>(type: "varchar(2)", unicode: false, maxLength: 2, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     AvatarId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
@@ -349,6 +349,12 @@ namespace ECOM.Infrastructure.Persistence.Main.Migrations
                 name: "IX_Language_AvatarId",
                 table: "Language",
                 column: "AvatarId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Language_Code",
+                table: "Language",
+                column: "Code",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_LanguageComponent_ComponentName",
