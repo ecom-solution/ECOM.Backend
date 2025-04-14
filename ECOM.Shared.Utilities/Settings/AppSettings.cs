@@ -7,6 +7,7 @@
 		public SmtpSetting Smtp { get; set; } = new SmtpSetting();
 		public StorageSetting Storage { get; set; } = new StorageSetting();
 		public LoggingSetting Logging { get; set; } = new LoggingSetting();
+		public RabbitMQSetting RabbitMQ { get; set; } = new RabbitMQSetting();
 
 		public class AuthenticationSetting
 		{
@@ -69,12 +70,15 @@
 		public class LoggingSetting
 		{
 			public string MinimumLevel { get; set; } = string.Empty;
-
 		}
 	
 		public class RabbitMQSetting
 		{
-
+			public string Host { get; set; } = string.Empty;
+			public string Username { get; set; } = string.Empty;
+			public string Password { get; set; } = string.Empty;
+			public string EmailQueue { get; set; } = string.Empty;
+			public string NotifyQueue { get; set; } = string.Empty;
 		}
 
 	}
