@@ -22,4 +22,8 @@
     <ProjectReference Include="..\ECOM.Infrastructure.Persistence.Main\ECOM.Infrastructure.Persistence.Main.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Interfaces\External\" />
+  </ItemGroup>
+
 </Project>
