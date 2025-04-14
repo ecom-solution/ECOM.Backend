@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ECOM.App.Services.Implementations
 {
-	public class LanguageComponentService
-	{
-	}
+    public class LanguageComponentService
+    {
+    }
 }

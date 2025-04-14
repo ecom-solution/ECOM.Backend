@@ -12,74 +12,74 @@ using System.Text.Json;
 
 namespace ECOM.App.Services.Implementations
 {
-	public class LocalizationService(
-		IMapper mapper,
-		IEcomLogger logger,
-		IOptions<AppSettings> appSettings,
-		IUnitOfWork<MainDbContext> mainUnitOfWork)
-		: BaseService(mapper, logger, appSettings, mainUnitOfWork), ILocalizationService
-	{		
-		public async Task<string> GenerateLocalizationContentAsync(string languageCode, string rootComponent)
-		{
-			var language = await _mainUnitOfWork.Repository<Language>()
-											    .FirstOrDefaultAsync(l => l.Code == languageCode) ?? throw new Exception($"Language '{languageCode}' not found.");
+    public class LocalizationService(
+        IMapper mapper,
+        IEcomLogger logger,
+        IOptions<AppSettings> appSettings,
+        IUnitOfWork<MainDbContext> mainUnitOfWork)
+        : BaseService(mapper, logger, appSettings, mainUnitOfWork), ILocalizationService
+    {
+        public async Task<string> GenerateLocalizationContentAsync(string languageCode, string rootComponent)
+        {
+            var language = await _mainUnitOfWork.Repository<Language>()
+                                                .FirstOrDefaultAsync(l => l.Code == languageCode) ?? throw new Exception($"Language '{languageCode}' not found.");
 
-			
-			var root = await _mainUnitOfWork.Repository<LanguageComponent>()
-											.FirstOrDefaultAsync(c => c.ComponentName == rootComponent) ?? throw new Exception($"Root component '{rootComponent}' not found.");
 
-			
+            var root = await _mainUnitOfWork.Repository<LanguageComponent>()
+                                            .FirstOrDefaultAsync(c => c.ComponentName == rootComponent) ?? throw new Exception($"Root component '{rootComponent}' not found.");
 
-			var content = await BuildComponentTreeAsync(root.Id, language.Id);
 
-			var result = new Dictionary<string, object>
-			{
-				{ root.ComponentName, content }
-			};
-			return JsonSerializer.Serialize(result, GetOptions());
-		}
 
-		private async Task<Dictionary<string, object>> BuildComponentTreeAsync(Guid componentId, Guid languageId)
-		{
-			var result = new Dictionary<string, object>();
+            var content = await BuildComponentTreeAsync(root.Id, language.Id);
 
-			// 1. Get translations for this component
-			var keys = await _mainUnitOfWork.Repository<LanguageKey>()
-											.Where(k => k.LanguageComponentId == componentId)
-											.ToListAsync();
+            var result = new Dictionary<string, object>
+            {
+                { root.ComponentName, content }
+            };
+            return JsonSerializer.Serialize(result, GetOptions());
+        }
 
-			if (keys.Count != 0)
-			{
-				var keyIds = keys.Select(k => k.Id).ToList();
+        private async Task<Dictionary<string, object>> BuildComponentTreeAsync(Guid componentId, Guid languageId)
+        {
+            var result = new Dictionary<string, object>();
 
-				var translations = await _mainUnitOfWork.Repository<LanguageTranslation>()
-					.Where(t => keyIds.Contains(t.LanguageKeyId) && t.LanguageId == languageId)
-					.ToListAsync();
+            // 1. Get translations for this component
+            var keys = await _mainUnitOfWork.Repository<LanguageKey>()
+                                            .Where(k => k.LanguageComponentId == componentId)
+                                            .ToListAsync();
 
-				foreach (var key in keys)
-				{
-					var value = translations.FirstOrDefault(t => t.LanguageKeyId == key.Id)?.Value ?? "";
-					result[key.Key] = value;
-				}
-			}
+            if (keys.Count != 0)
+            {
+                var keyIds = keys.Select(k => k.Id).ToList();
 
-			// 2. Get children components
-			var children = await _mainUnitOfWork.Repository<LanguageComponent>()
-												.Where(c => c.ParentId == componentId)
-												.ToListAsync();
+                var translations = await _mainUnitOfWork.Repository<LanguageTranslation>()
+                    .Where(t => keyIds.Contains(t.LanguageKeyId) && t.LanguageId == languageId)
+                    .ToListAsync();
 
-			foreach (var child in children)
-			{
-				var childContent = await BuildComponentTreeAsync(child.Id, languageId);
-				result[child.ComponentName] = childContent;
-			}
+                foreach (var key in keys)
+                {
+                    var value = translations.FirstOrDefault(t => t.LanguageKeyId == key.Id)?.Value ?? "";
+                    result[key.Key] = value;
+                }
+            }
 
-			return result;
-		}
+            // 2. Get children components
+            var children = await _mainUnitOfWork.Repository<LanguageComponent>()
+                                                .Where(c => c.ParentId == componentId)
+                                                .ToListAsync();
 
-		public static JsonSerializerOptions GetOptions()
-		{
-			return new JsonSerializerOptions { WriteIndented = true };
-		}
-	}
+            foreach (var child in children)
+            {
+                var childContent = await BuildComponentTreeAsync(child.Id, languageId);
+                result[child.ComponentName] = childContent;
+            }
+
+            return result;
+        }
+
+        public static JsonSerializerOptions GetOptions()
+        {
+            return new JsonSerializerOptions { WriteIndented = true };
+        }
+    }
 }

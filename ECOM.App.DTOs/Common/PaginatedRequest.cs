@@ -1,4 +1,4 @@
-﻿using ECOM.Shared.Utilities.Enums;
+﻿using ECOM.Domain.Shared.Enums.Common;
 
 namespace ECOM.App.DTOs.Common
 {
@@ -12,8 +12,8 @@ namespace ECOM.App.DTOs.Common
 	public class PaginatedFilterColumn
 	{
 		public string Name { get; set; } = string.Empty;
-		public PaginationEnums.FilterOperator? Operator { get; set; }
+		public PaginationFilterOperator? Operator { get; set; }
 		public string FilterValue { get; set; } = string.Empty;
-		public PaginationEnums.SortDirection? SortDirection { get; set; }
+		public PaginationSortDirection? SortDirection { get; set; }
 	}
 }

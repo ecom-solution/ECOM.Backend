@@ -1,6 +1,6 @@
 ﻿using ECOM.App.DTOs.Common;
+using ECOM.Domain.Shared.Enums.Common;
 using System.Linq.Expressions;
-using static ECOM.Shared.Utilities.Enums.PaginationEnums;
 
 namespace ECOM.App.Services.Extensions
 {
@@ -27,17 +27,17 @@ namespace ECOM.App.Services.Extensions
 
 					Expression? predicate = column.Operator switch
 					{
-						FilterOperator.Equals => Expression.Equal(property, constant),
-						FilterOperator.NotEquals => Expression.NotEqual(property, constant),
-						FilterOperator.GreaterThan => Expression.GreaterThan(property, constant),
-						FilterOperator.GreaterThanOrEqual => Expression.GreaterThanOrEqual(property, constant),
-						FilterOperator.LessThan => Expression.LessThan(property, constant),
-						FilterOperator.LessThanOrEqual => Expression.LessThanOrEqual(property, constant),
-						FilterOperator.Contains when propertyType == typeof(string) =>
+						PaginationFilterOperator.Equals => Expression.Equal(property, constant),
+						PaginationFilterOperator.NotEquals => Expression.NotEqual(property, constant),
+						PaginationFilterOperator.GreaterThan => Expression.GreaterThan(property, constant),
+						PaginationFilterOperator.GreaterThanOrEqual => Expression.GreaterThanOrEqual(property, constant),
+						PaginationFilterOperator.LessThan => Expression.LessThan(property, constant),
+						PaginationFilterOperator.LessThanOrEqual => Expression.LessThanOrEqual(property, constant),
+						PaginationFilterOperator.Contains when propertyType == typeof(string) =>
 							Expression.Call(property, nameof(string.Contains), null, constant),
-						FilterOperator.StartsWith when propertyType == typeof(string) =>
+						PaginationFilterOperator.StartsWith when propertyType == typeof(string) =>
 							Expression.Call(property, nameof(string.StartsWith), null, constant),
-						FilterOperator.EndsWith when propertyType == typeof(string) =>
+						PaginationFilterOperator.EndsWith when propertyType == typeof(string) =>
 							Expression.Call(property, nameof(string.EndsWith), null, constant),
 						_ => null
 					};
@@ -51,7 +51,7 @@ namespace ECOM.App.Services.Extensions
 
 				if (column.SortDirection.HasValue)
 				{
-					query = ApplyOrdering(query, column.Name, column.SortDirection.Value == SortDirection.Descending);
+					query = ApplyOrdering(query, column.Name, column.SortDirection.Value == PaginationSortDirection.Descending);
 				}
 			}
 

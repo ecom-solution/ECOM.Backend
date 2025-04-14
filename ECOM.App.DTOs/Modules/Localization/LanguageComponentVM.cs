@@ -1,4 +1,4 @@
-﻿using ECOM.Shared.Utilities.Enums;
+﻿using ECOM.Domain.Shared.Enums.Entity;
 
 namespace ECOM.App.DTOs.Modules.Localization
 {

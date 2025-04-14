@@ -1,6 +1,4 @@
 ﻿using ECOM.Domain.Interfaces.Repositories;
-using ECOM.Infrastructure.Persistence.Extensions;
-using ECOM.Shared.Utilities.Helpers;
 using ECOM.Shared.Utilities.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -19,6 +17,9 @@ namespace ECOM.Infrastructure.Persistence.Implementations.Repositories
 
 		public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
 		{
+			if (!_dbContext.ChangeTracker.HasChanges())
+				return 0;
+
 			return await _dbContext.SaveChangesAsync(cancellationToken);
 		}
 		#endregion

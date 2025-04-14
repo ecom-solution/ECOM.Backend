@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ECOM.App.DTOs\ECOM.App.DTOs.csproj" />
-    <ProjectReference Include="..\ECOM.App.Exceptions\ECOM.App.Exceptions.csproj" />
     <ProjectReference Include="..\ECOM.App.Mappings\ECOM.App.Mappings.csproj" />
     <ProjectReference Include="..\ECOM.App.Services\ECOM.App.Services.csproj" />
     <ProjectReference Include="..\ECOM.Infrastructure.External\ECOM.Infrastructure.External.csproj" />

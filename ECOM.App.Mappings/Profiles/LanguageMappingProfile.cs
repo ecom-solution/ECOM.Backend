@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using ECOM.App.DTOs.Modules.Localization;
-using ECOM.Domain.Entities.Main;
 
 namespace ECOM.App.Mappings.Profiles
 {
@@ -8,8 +6,7 @@ namespace ECOM.App.Mappings.Profiles
 	{
 		public LanguageMappingProfile()
 		{
-			CreateMap<LanguageComponent, LanguageComponentVM>().ReverseMap();
-			CreateMap<LanguageComponent, LanguageComponentRecordModel>().ReverseMap();
+			
 		}
 	}
 }
