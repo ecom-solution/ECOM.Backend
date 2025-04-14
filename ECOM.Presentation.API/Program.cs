@@ -53,9 +53,12 @@ builder.Services.AddApplicationServices();
 
 var app = builder.Build();
 
-// Migrate Db & Seed Data
-await app.Services.MigrateAsync();
-await app.Services.SeedDatabaseAsync();
+if (app.Environment.IsDevelopment())
+{
+	// Migrate Db & Seed Data
+	await app.Services.MigrateAsync();
+	await app.Services.SeedDatabaseAsync();
+}
 
 // Enable Serilog request logging
 app.UseSerilogRequestLogging();
