@@ -55,10 +55,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECOM.App.Mappings", "ECOM.A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workers", "Workers", "{EE2AC006-33F5-4CFC-A3B9-3CCECCE2C895}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECOM.Presentation.Workers.EmailConsumer", "ECOM.Presentation.Workers.EmailConsumer\ECOM.Presentation.Workers.EmailConsumer.csproj", "{B8198EC7-4965-4F53-8268-F1D5866DD427}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECOM.Presentation.Workers.NotifyConsumer", "ECOM.Presentation.Workers.NotifyConsumer\ECOM.Presentation.Workers.NotifyConsumer.csproj", "{4E0995BC-3F81-4BA3-AF41-2C3F58FC5FEB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,14 +117,6 @@ Global
 		{8D379B98-740B-429C-9AE9-BC46F7A0C061}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D379B98-740B-429C-9AE9-BC46F7A0C061}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D379B98-740B-429C-9AE9-BC46F7A0C061}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B8198EC7-4965-4F53-8268-F1D5866DD427}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B8198EC7-4965-4F53-8268-F1D5866DD427}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B8198EC7-4965-4F53-8268-F1D5866DD427}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B8198EC7-4965-4F53-8268-F1D5866DD427}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4E0995BC-3F81-4BA3-AF41-2C3F58FC5FEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E0995BC-3F81-4BA3-AF41-2C3F58FC5FEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4E0995BC-3F81-4BA3-AF41-2C3F58FC5FEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4E0995BC-3F81-4BA3-AF41-2C3F58FC5FEB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -154,8 +142,6 @@ Global
 		{8E4BB1A3-E2C8-4610-B875-216049A3A22C} = {D4B556C2-5D05-41F0-9EA0-FAA9AA4FDE40}
 		{8D379B98-740B-429C-9AE9-BC46F7A0C061} = {72564C8E-CC8E-48A6-943C-3AE414E04755}
 		{EE2AC006-33F5-4CFC-A3B9-3CCECCE2C895} = {1FBD99EE-C79A-4D2E-AAC9-6279040EF45F}
-		{B8198EC7-4965-4F53-8268-F1D5866DD427} = {EE2AC006-33F5-4CFC-A3B9-3CCECCE2C895}
-		{4E0995BC-3F81-4BA3-AF41-2C3F58FC5FEB} = {EE2AC006-33F5-4CFC-A3B9-3CCECCE2C895}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EEF19FB7-3D8A-4BA7-8E23-FDDE98F524E1}

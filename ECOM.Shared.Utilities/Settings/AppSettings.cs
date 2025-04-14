@@ -71,5 +71,11 @@
 			public string MinimumLevel { get; set; } = string.Empty;
 
 		}
+	
+		public class RabbitMQSetting
+		{
+
+		}
+
 	}
 }

@@ -26,12 +26,7 @@
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7170;http://localhost:5168",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ConnectionStrings__MainDbContext": "Data Source=.\\SQLEXPRESS;Initial Catalog=Minibox;Encrypt=False;Persist Security Info=True;User ID=sa;Password=Cucdang9999@@;TrustServerCertificate=True;",
-        "ConnectionStrings__MainLoggingDbContext": "Data Source=.\\SQLEXPRESS;Initial Catalog=MiniboxLogging;Encrypt=False;Persist Security Info=True;User ID=sa;Password=Cucdang9999@@;TrustServerCertificate=True;",
-        "AppSettings__Authentication__Jwt__SecretKey": "EComSecretKeyMustBeAtLeast32Characters!!!",
-        "AppSettings__Storage__AccessKey": "admin",
-        "AppSettings__Storage__SecretKey": "admin123"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "IIS Express": {
