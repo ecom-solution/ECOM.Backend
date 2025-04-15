@@ -1,9 +1,9 @@
-﻿using ECOM.App.DTOs.Common;
-using ECOM.App.DTOs.Modules.Authentication.Users;
+﻿using ECOM.Shared.Library.Models.Dtos.Common;
+using ECOM.Shared.Library.Models.Dtos.Modules.Authentication.Users;
 
 namespace ECOM.App.Services.Interfaces
 {
-    public interface IAuthenticationService
+	public interface IAuthenticationService
     {
         /// <summary>
         /// Registers a new user account into the system.

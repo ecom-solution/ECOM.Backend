@@ -1,8 +1,8 @@
-﻿using ECOM.Domain.Shared.Enums.Entity;
+﻿using ECOM.Shared.Library.Enums.Entity;
 
 namespace ECOM.Domain.Entities.Main
 {
-    public class ApplicationUser : AuditableEntity
+	public class ApplicationUser : AuditableEntity
     {
         public ApplicationUser() { }
 

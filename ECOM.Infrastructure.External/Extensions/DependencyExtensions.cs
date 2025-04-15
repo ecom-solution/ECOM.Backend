@@ -1,5 +1,5 @@
 ﻿using ECOM.Infrastructure.External.Common;
-using ECOM.Shared.Utilities.Settings;
+using ECOM.Shared.Library.Models.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Minio;

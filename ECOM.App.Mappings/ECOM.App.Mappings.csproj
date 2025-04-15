@@ -11,7 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ECOM.App.DTOs\ECOM.App.DTOs.csproj" />
     <ProjectReference Include="..\ECOM.Domain.Entities\ECOM.Domain.Entities.csproj" />
   </ItemGroup>
 

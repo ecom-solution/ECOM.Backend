@@ -1,5 +1,5 @@
-﻿using ECOM.App.DTOs.Common;
-using ECOM.Domain.Shared.Enums.Common;
+﻿using ECOM.Shared.Library.Enums.Common;
+using ECOM.Shared.Library.Models.Dtos.Common;
 using System.Linq.Expressions;
 
 namespace ECOM.App.Services.Extensions

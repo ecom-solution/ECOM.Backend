@@ -3,7 +3,7 @@ using ECOM.Domain.Interfaces.Repositories;
 using ECOM.Infrastructure.Logging.Interfaces;
 using ECOM.Infrastructure.Persistence.Extensions;
 using ECOM.Infrastructure.Persistence.Main;
-using ECOM.Shared.Utilities.Settings;
+using ECOM.Shared.Library.Models.Settings;
 using Microsoft.Extensions.Options;
 
 namespace ECOM.Infrastructure.Persistence.Implementations.Seeders.Main

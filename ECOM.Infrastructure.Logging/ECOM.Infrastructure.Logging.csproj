@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ECOM.Shared.Utilities\ECOM.Shared.Utilities.csproj" />
+    <ProjectReference Include="..\ECOM.Shared.Library\ECOM.Shared.Library.csproj" />
   </ItemGroup>
 
 </Project>

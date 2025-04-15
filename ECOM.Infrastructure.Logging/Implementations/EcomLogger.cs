@@ -1,5 +1,5 @@
 ﻿using ECOM.Infrastructure.Logging.Interfaces;
-using ECOM.Shared.Utilities.Settings;
+using ECOM.Shared.Library.Models.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Serilog;

@@ -1,5 +1,5 @@
 ﻿using ECOM.Infrastructure.Logging.Interfaces;
-using ECOM.Shared.Utilities.Settings;
+using ECOM.Shared.Library.Models.Settings;
 using Microsoft.Extensions.Options;
 
 namespace ECOM.Infrastructure.External.Common

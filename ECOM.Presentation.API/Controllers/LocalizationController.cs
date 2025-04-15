@@ -1,11 +1,11 @@
 ﻿using ECOM.App.Services.Interfaces;
 using ECOM.Infrastructure.Logging.Interfaces;
-using ECOM.Shared.Utilities.Constants;
+using ECOM.Shared.Library.Consts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECOM.Presentation.API.Controllers
 {
-    [ApiController]
+	[ApiController]
 	[Route("api/[controller]")]
 	public class LocalizationController(
 		IEcomLogger logger,

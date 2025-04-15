@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using ECOM.App.DTOs.Common;
 using ECOM.Infrastructure.Logging.Interfaces;
-using ECOM.Shared.Utilities.Exceptions.HttpStatusException.Base;
+using ECOM.Shared.Library.Exceptions;
+using ECOM.Shared.Library.Models.Dtos.Common;
 
 namespace ECOM.Presentation.API.Middlewares
 {

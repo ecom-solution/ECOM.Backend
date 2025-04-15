@@ -1,17 +1,12 @@
 ﻿using ECOM.Infrastructure.External.Common;
 using ECOM.Infrastructure.Logging.Interfaces;
-using ECOM.Shared.Utilities.Helpers;
-using ECOM.Shared.Utilities.Settings;
 using Microsoft.Extensions.Options;
 using Minio.DataModel.Args;
 using Minio;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ECOM.App.Services.Interfaces.Storages;
-using ECOM.Domain.Shared.ExternalModels.MinIO;
+using ECOM.Shared.Library.Models.Settings;
+using ECOM.Shared.Library.Models.Externals.MinIO;
+using ECOM.Shared.Library.Functions.Helpers;
 
 namespace ECOM.Infrastructure.External.Implementations.Storages
 {
@@ -33,7 +28,7 @@ namespace ECOM.Infrastructure.External.Implementations.Storages
 		{
 			await EnsureBucketExistsAsync(bucketName, true);
 
-			return await RetryHelper.RetryAsync(async () =>
+			return await CommonHelper.RetryAsync(async () =>
 			{
 				await _client.PutObjectAsync(new PutObjectArgs()
 				.WithBucket(bucketName)

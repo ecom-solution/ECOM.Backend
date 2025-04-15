@@ -2,7 +2,7 @@
 using ECOM.Domain.Interfaces.Seeders;
 using ECOM.Infrastructure.Logging.Interfaces;
 using ECOM.Infrastructure.Persistence.Main;
-using ECOM.Shared.Utilities.Settings;
+using ECOM.Shared.Library.Models.Settings;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 

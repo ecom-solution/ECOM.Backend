@@ -5,14 +5,14 @@ using ECOM.Domain.Entities.Main;
 using ECOM.Domain.Interfaces.Repositories;
 using ECOM.Infrastructure.Logging.Interfaces;
 using ECOM.Infrastructure.Persistence.Main;
-using ECOM.Shared.Utilities.Settings;
+using ECOM.Shared.Library.Models.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace ECOM.App.Services.Implementations
 {
-    public class LocalizationService(
+	public class LocalizationService(
         IMapper mapper,
         IEcomLogger logger,
         IOptions<AppSettings> appSettings,

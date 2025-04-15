@@ -1,23 +1,23 @@
 ﻿using AutoMapper;
-using ECOM.App.DTOs.Modules.File;
 using ECOM.App.Services.Common;
 using ECOM.App.Services.Interfaces;
 using ECOM.Domain.Entities.Main;
 using ECOM.Domain.Interfaces.Repositories;
 using ECOM.Infrastructure.Logging.Interfaces;
 using ECOM.Infrastructure.Persistence.Main;
-using ECOM.Shared.Utilities.Settings;
+using ECOM.Shared.Library.Models.Externals.MinIO;
+using ECOM.Shared.Library.Models.Settings;
 using Microsoft.Extensions.Options;
 
 namespace ECOM.App.Services.Implementations
 {
-    public class FileEntityService(
+	public class FileEntityService(
         IMapper mapper, IEcomLogger logger,
         IOptions<AppSettings> appSettings,
         IUnitOfWork<MainDbContext> mainUnitOfWork)
         : BaseService(mapper, logger, appSettings, mainUnitOfWork), IFileEntityService
     {
-        public async Task InsertFileEntityAsync(UploadFileResult uploadFile)
+        public async Task InsertFileEntityAsync(UploadFileResponse uploadFile)
         {
             try
             {

@@ -1,12 +1,11 @@
-﻿using ECOM.App.DTOs.Common;
-using ECOM.App.DTOs.Modules.Authentication.Users;
-using ECOM.App.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
+﻿using ECOM.App.Services.Interfaces;
+using ECOM.Shared.Library.Models.Dtos.Common;
+using ECOM.Shared.Library.Models.Dtos.Modules.Authentication.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECOM.Presentation.API.Controllers
 {
-    [Route("api/[controller]")]
+	[Route("api/[controller]")]
 	[ApiController]
 	public class AuthenticationController(IAuthenticationService authenticationService) : ControllerBase
 	{

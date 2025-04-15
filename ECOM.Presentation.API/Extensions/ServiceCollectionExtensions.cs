@@ -1,7 +1,5 @@
-﻿using ECOM.Shared.Utilities.Settings;
+﻿using ECOM.Shared.Library.Models.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 

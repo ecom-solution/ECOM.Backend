@@ -2,8 +2,7 @@
 using ECOM.Domain.Interfaces.Seeders;
 using ECOM.Infrastructure.Logging.Interfaces;
 using ECOM.Infrastructure.Persistence.Main;
-using ECOM.Shared.Utilities.Settings;
-using Microsoft.EntityFrameworkCore;
+using ECOM.Shared.Library.Models.Settings;
 using Microsoft.Extensions.Options;
 
 namespace ECOM.Infrastructure.Persistence.Implementations.Seeders

@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ECOM.Domain.Shared\ECOM.Domain.Shared.csproj" />
+    <ProjectReference Include="..\ECOM.Shared.Library\ECOM.Shared.Library.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 ﻿using ECOM.Domain.Interfaces.Repositories;
-using ECOM.Shared.Utilities.Settings;
+using ECOM.Shared.Library.Models.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Reflection;

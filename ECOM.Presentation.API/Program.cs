@@ -5,8 +5,8 @@ using ECOM.Infrastructure.External.Extensions;
 using ECOM.Infrastructure.Persistence.Extensions;
 using ECOM.Presentation.API.Extensions;
 using ECOM.Presentation.API.Middlewares;
-using ECOM.Shared.Utilities.Settings;
 using Serilog;
+using ECOM.Shared.Library.Models.Settings;
 
 var builder = WebApplication.CreateBuilder(args); 
 

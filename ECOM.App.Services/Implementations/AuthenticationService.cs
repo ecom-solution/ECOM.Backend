@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
-using ECOM.App.DTOs.Common;
-using ECOM.App.DTOs.Modules.Authentication.Users;
 using ECOM.App.Services.Common;
 using ECOM.App.Services.Interfaces;
 using ECOM.Domain.Entities.Main;
 using ECOM.Domain.Interfaces.Repositories;
-using ECOM.Domain.Shared.Enums.Entity;
 using ECOM.Infrastructure.Logging.Interfaces;
 using ECOM.Infrastructure.Persistence.Main;
-using ECOM.Shared.Utilities.Constants;
-using ECOM.Shared.Utilities.Exceptions.HttpStatusException;
-using ECOM.Shared.Utilities.Settings;
+using ECOM.Shared.Library.Consts;
+using ECOM.Shared.Library.Enums.Entity;
+using ECOM.Shared.Library.Exceptions.HttpStatus;
+using ECOM.Shared.Library.Models.Dtos.Common;
+using ECOM.Shared.Library.Models.Dtos.Modules.Authentication.Users;
+using ECOM.Shared.Library.Models.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -25,7 +25,7 @@ using System.Text;
 
 namespace ECOM.App.Services.Implementations
 {
-    public class AuthenticationService(
+	public class AuthenticationService(
         IMapper mapper,
         IEcomLogger logger,
         IOptions<AppSettings> appSettings,

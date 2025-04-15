@@ -1,4 +1,4 @@
-﻿using ECOM.Domain.Shared.ExternalModels.MinIO;
+﻿using ECOM.Shared.Library.Models.Externals.MinIO;
 
 namespace ECOM.App.Services.Interfaces.Storages
 {

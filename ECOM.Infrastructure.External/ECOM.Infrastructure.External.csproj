@@ -12,8 +12,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ECOM.Domain.Interfaces\ECOM.Domain.Interfaces.csproj" />
-    <ProjectReference Include="..\ECOM.Domain.Shared\ECOM.Domain.Shared.csproj" />
     <ProjectReference Include="..\ECOM.Infrastructure.Logging\ECOM.Infrastructure.Logging.csproj" />
+    <ProjectReference Include="..\ECOM.Shared.Library\ECOM.Shared.Library.csproj" />
   </ItemGroup>
 
 </Project>
