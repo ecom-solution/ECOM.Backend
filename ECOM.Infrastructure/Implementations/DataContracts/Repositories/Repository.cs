@@ -80,6 +80,17 @@ namespace ECOM.Infrastructure.Implementations.DataContracts.Repositories
 		}
 
 		/// <inheritdoc/>
+		public async Task<List<TOut>> ToListAsync<TOut>(IQueryable<TEntity> query, Expression<Func<TEntity, TOut>> selector)
+		{
+			ArgumentNullException.ThrowIfNull(query);
+
+			ArgumentNullException.ThrowIfNull(selector);
+
+			// Project the query into the desired output type and execute it asynchronously.
+			return await query.Select(selector).ToListAsync();
+		}
+
+		/// <inheritdoc/>
 		public async Task<bool> AnyAsync(IQueryable<TEntity> query)
 		{
 			return await query.AnyAsync();

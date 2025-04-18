@@ -3,6 +3,10 @@ using ECOM.App.Interfaces.BusinessLogics;
 using ECOM.App.Interfaces.Loggings;
 using ECOM.Domain.Entities.Main;
 using ECOM.Domain.Interfaces.DataContracts;
+using ECOM.Domain.Interfaces.Messagings;
+using ECOM.Shared.Library.Consts;
+using ECOM.Shared.Library.Models.Dtos.Modules.Language;
+using ECOM.Shared.Library.Models.Externals.RabbitMQ;
 using ECOM.Shared.Library.Models.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -14,9 +18,11 @@ namespace ECOM.App.Implementations.BusinessLogics
 		ILog logger,
 		IOptions<AppSettings> appSettings,
 		[FromKeyedServices("Main")] IUnitOfWork mainUnitOfWork,
-		[FromKeyedServices("MainLogging")] IUnitOfWork loggingUnitOfWork)
+		[FromKeyedServices("MainLogging")] IUnitOfWork loggingUnitOfWork,
+		IPublisher publisher)
 		: BaseService(logger, appSettings, mainUnitOfWork, loggingUnitOfWork), ILanguageService
 	{
+		private readonly IPublisher _publisher = publisher;
 		public async Task<string> GenerateLocalizationContentAsync(string languageCode, string rootComponent)
 		{
 			var language = await _mainUnitOfWork.Repository<Language>()
@@ -39,6 +45,34 @@ namespace ECOM.App.Implementations.BusinessLogics
 			return JsonSerializer.Serialize(result, GetOptions());
 		}
 
+		public async Task<List<LanguageDto>> GetLanguagesAsync()
+		{
+			var defaultLanguageCode = ApplicationConstants.DefaultLanguage;
+
+			var query = _mainUnitOfWork.Repository<Language>()
+				.Include(x => x.Avatar)
+				.OrderBy(x => x.Name);
+
+			return await _mainUnitOfWork.Repository<Language>().ToListAsync(query, x => new LanguageDto
+			{
+				Code = x.Code,
+				Name = x.Name,
+				IsDefault = x.Code == defaultLanguageCode,
+				AvatarUrl = x.Avatar != null ? x.Avatar.FileUrl : null
+			});
+		}
+
+		public async Task TestSendMailAsync()
+		{
+			await _publisher.PublishAsync(new EmailMessage()
+			{
+				To = "gg.tintran@gmail.com",
+				Subject = "Test email zoho",
+				Body = "Test email zoho"
+			}, _appSettings.RabbitMQ.EmailQueue);
+		}
+
+		//-------------------------------------------------------------------------------------------------------------------
 		private async Task<Dictionary<string, object>> BuildComponentTreeAsync(Guid componentId, Guid languageId)
 		{
 			var result = new Dictionary<string, object>();
@@ -75,7 +109,7 @@ namespace ECOM.App.Implementations.BusinessLogics
 			return result;
 		}
 
-		public static JsonSerializerOptions GetOptions()
+		private static JsonSerializerOptions GetOptions()
 		{
 			return new JsonSerializerOptions { WriteIndented = true };
 		}

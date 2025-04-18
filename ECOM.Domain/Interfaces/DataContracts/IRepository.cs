@@ -143,6 +143,15 @@ namespace ECOM.Domain.Interfaces.DataContracts
 		Task<List<TEntity>> ToListAsync(IQueryable<TEntity> query);
 
 		/// <summary>
+		/// Executes a projection query and returns a list of results of type <typeparamref name="TOut"/>.
+		/// </summary>
+		/// <typeparam name="TOut">The type to project the query results into (e.g., a DTO).</typeparam>
+		/// <param name="query">The base query on the entity.</param>
+		/// <param name="selector">The projection selector used to map the entity to the output type.</param>
+		/// <returns>A list of <typeparamref name="TOut"/> results asynchronously.</returns>
+		Task<List<TOut>> ToListAsync<TOut>(IQueryable<TEntity> query, Expression<Func<TEntity, TOut>> selector);
+
+		/// <summary>
 		/// Checks if any entity in the query matches the condition asynchronously.
 		/// </summary>
 		/// <param name="query">The queryable object to evaluate.</param>

@@ -35,5 +35,12 @@ namespace ECOM.Presentation.API.Controllers
 
 			return Content(jsonContent, FileContentType.Json);
 		}
+
+		[HttpGet("test-sendmail")]
+		public async Task<IActionResult> TestSendMailAsync()
+		{
+			await _languageService.TestSendMailAsync();
+			return Ok();
+		}
 	}
 }
