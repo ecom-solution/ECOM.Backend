@@ -8,5 +8,7 @@
 		public const string DefaultCurrency = "VND";
 
 		public const string RefreshToken = "RefreshToken";
+
+		public const string DefaultCors = "DefaultCors";
 	}
 }
