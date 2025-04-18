@@ -1,12 +1,12 @@
-using ECOM.App.Mappings.Extensions;
-using ECOM.App.Services.Extensions;
-using ECOM.Infrastructure.Logging.Extensions;
-using ECOM.Infrastructure.Persistence.Extensions;
-using ECOM.Infrastructure.External.Services.Extensions;
+using Serilog;
+using ECOM.App.Extenstions;
+using ECOM.Infrastructure.Extensions;
+using ECOM.Infrastructure.Implementations.Notifications.SignalR;
+
 using ECOM.Presentation.API.Extensions;
 using ECOM.Presentation.API.Middlewares;
-using ECOM.Shared.Utilities.Settings;
-using Serilog;
+using ECOM.Shared.Library.Models.Settings;
+
 
 var builder = WebApplication.CreateBuilder(args); 
 
@@ -31,33 +31,21 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//Add for use Serilog
-builder.Services.AddHttpContextAccessor();
+//Add Logging
+builder.AddLogging(builder.Configuration);
 
-//Add Loggings Module
-builder.AddECOMLogging(builder.Configuration);
+//Add Infrastructure
+builder.Services.AddInfrastructure(builder.Configuration);
 
-//Add Mappings Module
-builder.Services.AddMappingModule();
-
-//Add Persistence Module (Entity DbContext)
-builder.Services.AddPersistence(builder.Configuration);
-
-//Add External Module
-builder.Services.AddExternalModule();
-
-//Add Application Services Module
 builder.Services.AddApplicationServices();
 
 //-----------------------------------------------------------------------------
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
 	// Migrate Db & Seed Data
-	await app.Services.MigrateAsync();
-	await app.Services.SeedDatabaseAsync();
+	await app.Services.InitializeDatabaseAsync();
 }
 
 // Enable Serilog request logging
@@ -87,6 +75,8 @@ app.UseMiddleware<JwtValidationMiddleware>();
 
 // Authorization Middleware
 app.UseAuthorization();
+
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 // Map Controllers
 app.MapControllers();
