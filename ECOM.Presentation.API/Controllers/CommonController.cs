@@ -84,7 +84,7 @@ namespace ECOM.Presentation.API.Controllers
 		/// </summary>
 		/// <returns>List of supported languages.</returns>
 		[HttpGet("languages")]
-		public async Task<ActionResult<List<LanguageDto>>> GetLanguages()
+		public async Task<IActionResult> GetLanguages()
 		{
 			var result = await _languageService.GetLanguagesAsync();
 			return Ok(result);
