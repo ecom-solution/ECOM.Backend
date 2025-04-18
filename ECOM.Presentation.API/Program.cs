@@ -6,6 +6,7 @@ using ECOM.Infrastructure.Implementations.Notifications.SignalR;
 using ECOM.Presentation.API.Extensions;
 using ECOM.Presentation.API.Middlewares;
 using ECOM.Shared.Library.Models.Settings;
+using ECOM.Shared.Library.Consts;
 
 
 var builder = WebApplication.CreateBuilder(args); 
@@ -20,9 +21,13 @@ builder.Services.AddOptions<AppSettings>()
 				.ValidateDataAnnotations() 
 				.ValidateOnStart();
 
-// Add services to the container.
+// Add services to the container------------------------------
 
+// Add Controllers
 builder.Services.AddControllers();
+
+// Add Default Cors Policy
+builder.Services.AddDefaultCorsPolicy(builder.Configuration);
 
 // Add Jwt
 builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -41,6 +46,8 @@ builder.Services.AddApplicationServices();
 
 //-----------------------------------------------------------------------------
 var app = builder.Build();
+
+app.UseCors(ApplicationConstants.DefaultCors);
 
 if (app.Environment.IsDevelopment())
 {
