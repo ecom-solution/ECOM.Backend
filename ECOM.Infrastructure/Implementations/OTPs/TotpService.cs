@@ -16,7 +16,7 @@ namespace ECOM.Infrastructure.Implementations.OTPs
 			return Base32Encoding.ToString(KeyGeneration.GenerateRandomKey(20));
 		}
 
-		public bool VerifyOtp(string secretKey, string otpCode)
+		public bool VerifyOtp(string otpCode, string secretKey)
 		{
 			var totp = new Totp(Base32Encoding.ToBytes(secretKey));
 			return totp.VerifyTotp(otpCode, out _);
