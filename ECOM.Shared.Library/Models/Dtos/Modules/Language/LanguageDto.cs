@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ECOM.Shared.Library.Models.Dtos.Modules.Language
+﻿namespace ECOM.Shared.Library.Models.Dtos.Modules.Language
 {
 	public class LanguageDto
 	{
