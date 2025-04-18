@@ -1,5 +1,5 @@
-﻿using ECOM.App.Services.Interfaces;
-using ECOM.Infrastructure.Logging.Interfaces;
+﻿using ECOM.App.Interfaces.BusinessLogics;
+using ECOM.App.Interfaces.Loggings;
 using ECOM.Shared.Library.Consts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +8,11 @@ namespace ECOM.Presentation.API.Controllers
 	[ApiController]
 	[Route("api/[controller]")]
 	public class LocalizationController(
-		IEcomLogger logger,
-		ILocalizationService localizationService) : ControllerBase
+		ILog logger,
+		ILanguageService languageService) : ControllerBase
 	{
-		private readonly IEcomLogger _logger = logger;
-		private readonly ILocalizationService _localizationService = localizationService;
+		private readonly ILog _logger = logger;
+		private readonly ILanguageService _languageService = languageService;
 		
 		/// <summary>
 		/// Generate full localization JSON from root component
@@ -31,7 +31,7 @@ namespace ECOM.Presentation.API.Controllers
 			if (string.IsNullOrWhiteSpace(rootComponent))
 				return BadRequest("RootComponent is required.");
 
-			var jsonContent = await _localizationService.GenerateLocalizationContentAsync(languageCode, rootComponent);
+			var jsonContent = await _languageService.GenerateLocalizationContentAsync(languageCode, rootComponent);
 
 			return Content(jsonContent, FileContentType.Json);
 		}

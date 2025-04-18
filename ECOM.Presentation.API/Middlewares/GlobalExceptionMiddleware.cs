@@ -1,14 +1,14 @@
 ﻿using System.Text.Json;
-using ECOM.Infrastructure.Logging.Interfaces;
+using ECOM.App.Interfaces.Loggings;
 using ECOM.Shared.Library.Exceptions;
 using ECOM.Shared.Library.Models.Dtos.Common;
 
 namespace ECOM.Presentation.API.Middlewares
 {
-	public class GlobalExceptionMiddleware(RequestDelegate next, IEcomLogger logger, IHostEnvironment env)
+	public class GlobalExceptionMiddleware(RequestDelegate next, ILog logger, IHostEnvironment env)
 	{
 		private readonly RequestDelegate _next = next;
-		private readonly IEcomLogger _logger = logger;
+		private readonly ILog _logger = logger;
 		private readonly IHostEnvironment _env = env;
 
 		public async Task InvokeAsync(HttpContext context)

@@ -1,4 +1,4 @@
-﻿using ECOM.App.Services.Interfaces;
+﻿using ECOM.App.Interfaces.BusinessLogics;
 using ECOM.Shared.Library.Models.Dtos.Common;
 using ECOM.Shared.Library.Models.Dtos.Modules.Authentication.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -7,9 +7,9 @@ namespace ECOM.Presentation.API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class AuthenticationController(IAuthenticationService authenticationService) : ControllerBase
+	public class AuthenticationController(IAuthService authenticationService) : ControllerBase
 	{
-		private readonly IAuthenticationService _authenticationService = authenticationService;
+		private readonly IAuthService _authenticationService = authenticationService;
 
 		[HttpPost("signup")]
 		public async Task<IActionResult> SignUp([FromBody] BaseRequest<UserSignUp> request)
