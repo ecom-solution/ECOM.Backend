@@ -28,10 +28,13 @@ namespace ECOM.Presentation.API.Controllers
 			var timeZones = TimeZoneInfo.GetSystemTimeZones()
 				.Select(tz => new
 				{
-					TimeZoneId = tz.Id,                // The system identifier of the time zone
-					TimeZoneName = tz.DisplayName,     // The human-readable name (e.g., "(UTC+07:00) Bangkok, Hanoi, Jakarta")
-					IsDefault = tz.Id == defaultTz     // Indicates whether this is the default time zone
+					TimeZoneId = tz.Id,
+					TimeZoneName = tz.DisplayName,
+					ShortName = $"(UTC{tz.BaseUtcOffset:hh\\:mm})", // 👉 Format as (UTC+07:00) or (UTC-02:00)
+					IsDefault = tz.Id == defaultTz
 				})
+				.OrderByDescending(tz => tz.IsDefault)
+				.ThenBy(tz => tz.TimeZoneName)
 				.ToList();
 
 			return Ok(timeZones);
