@@ -95,6 +95,7 @@
 		public class LoggingSetting
 		{
 			public string MinimumLevel { get; set; } = string.Empty;
+			public string MaximumLevel { get; set; } = string.Empty;
 		}
 
 		public class RabbitMQSetting
