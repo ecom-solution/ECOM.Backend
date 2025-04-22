@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ECOM.Infrastructure.Database.MainLogging.Migrations
+namespace ECOM.Infrastructure.Database.Main.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialLoggingDbContext : Migration
+    public partial class InitialMainDbContext : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,6 +36,43 @@ namespace ECOM.Infrastructure.Database.MainLogging.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ApplicationRole", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Currency",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Code = table.Column<string>(type: "varchar(10)", unicode: false, maxLength: 10, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Symbol = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    IsDefault = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CurrencySymbolPosition = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    DecimalDigits = table.Column<int>(type: "int", nullable: false, defaultValue: 2),
+                    DecimalSeparator = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
+                    ThousandsSeparator = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Currency", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CurrencyExchangeRateSource",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    ApiKey = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    ApiSecret = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    UpdateIntervalSeconds = table.Column<int>(type: "int", nullable: false, defaultValue: 3600),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    Configuration = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CurrencyExchangeRateSource", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -78,27 +115,6 @@ namespace ECOM.Infrastructure.Database.MainLogging.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Log",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedAt_Utc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Level = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    Message = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: false),
-                    Exception = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: true),
-                    Properties = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: true),
-                    CallerMethod = table.Column<string>(type: "varchar(1000)", unicode: false, maxLength: 1000, nullable: true),
-                    CallerFileName = table.Column<string>(type: "varchar(1000)", unicode: false, maxLength: 1000, nullable: true),
-                    CallerLineNumber = table.Column<int>(type: "int", nullable: true),
-                    IpAddress = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: true),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Log", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Notification",
                 columns: table => new
                 {
@@ -117,25 +133,18 @@ namespace ECOM.Infrastructure.Database.MainLogging.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TransactionLog",
+                name: "SeedState",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedAt_Utc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Level = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    Message = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: false),
-                    Exception = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: true),
-                    Properties = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: true),
-                    CallerMethod = table.Column<string>(type: "varchar(1000)", unicode: false, maxLength: 1000, nullable: true),
-                    CallerFileName = table.Column<string>(type: "varchar(1000)", unicode: false, maxLength: 1000, nullable: true),
-                    CallerLineNumber = table.Column<int>(type: "int", nullable: true),
-                    IpAddress = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: true),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    TransactionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    SeedName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CurrentHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastSeededAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TransactionLog", x => x.Id);
+                    table.PrimaryKey("PK_SeedState", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -160,6 +169,40 @@ namespace ECOM.Infrastructure.Database.MainLogging.Migrations
                         principalTable: "ApplicationRole",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CurrencyExchangeRate",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CurrencyExchangeRateSourceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FromCurrencyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ToCurrencyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Rate = table.Column<decimal>(type: "decimal(18,6)", nullable: false),
+                    LastUpdatedDate_Utc = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CurrencyExchangeRate", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CurrencyExchangeRate_CurrencyExchangeRateSource_CurrencyExchangeRateSourceId",
+                        column: x => x.CurrencyExchangeRateSourceId,
+                        principalTable: "CurrencyExchangeRateSource",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CurrencyExchangeRate_Currency_FromCurrencyId",
+                        column: x => x.FromCurrencyId,
+                        principalTable: "Currency",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CurrencyExchangeRate_Currency_ToCurrencyId",
+                        column: x => x.ToCurrencyId,
+                        principalTable: "Currency",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -216,6 +259,7 @@ namespace ECOM.Infrastructure.Database.MainLogging.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Code = table.Column<string>(type: "varchar(2)", unicode: false, maxLength: 2, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    IsDefault = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     AvatarId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
@@ -313,6 +357,32 @@ namespace ECOM.Infrastructure.Database.MainLogging.Migrations
                         name: "FK_ApplicationUserLogin_ApplicationUser_UserId",
                         column: x => x.UserId,
                         principalTable: "ApplicationUser",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ApplicationUserNotification",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NotificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsSeen = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    SeenDate_Utc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApplicationUserNotification", x => new { x.UserId, x.NotificationId });
+                    table.ForeignKey(
+                        name: "FK_ApplicationUserNotification_ApplicationUser_UserId",
+                        column: x => x.UserId,
+                        principalTable: "ApplicationUser",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ApplicationUserNotification_Notification_NotificationId",
+                        column: x => x.NotificationId,
+                        principalTable: "Notification",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -429,9 +499,41 @@ namespace ECOM.Infrastructure.Database.MainLogging.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ApplicationUserNotification_NotificationId",
+                table: "ApplicationUserNotification",
+                column: "NotificationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ApplicationUserRole_RoleId",
                 table: "ApplicationUserRole",
                 column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Currency_Code",
+                table: "Currency",
+                column: "Code",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CurrencyExchangeRate_CurrencyExchangeRateSourceId",
+                table: "CurrencyExchangeRate",
+                column: "CurrencyExchangeRateSourceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CurrencyExchangeRate_FromCurrencyId",
+                table: "CurrencyExchangeRate",
+                column: "FromCurrencyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CurrencyExchangeRate_FromCurrencyId_ToCurrencyId",
+                table: "CurrencyExchangeRate",
+                columns: new[] { "FromCurrencyId", "ToCurrencyId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CurrencyExchangeRate_ToCurrencyId",
+                table: "CurrencyExchangeRate",
+                column: "ToCurrencyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Language_AvatarId",
@@ -484,10 +586,16 @@ namespace ECOM.Infrastructure.Database.MainLogging.Migrations
                 name: "ApplicationUserLogin");
 
             migrationBuilder.DropTable(
+                name: "ApplicationUserNotification");
+
+            migrationBuilder.DropTable(
                 name: "ApplicationUserRole");
 
             migrationBuilder.DropTable(
                 name: "ApplicationUserToken");
+
+            migrationBuilder.DropTable(
+                name: "CurrencyExchangeRate");
 
             migrationBuilder.DropTable(
                 name: "LanguageTranslation");
@@ -496,13 +604,10 @@ namespace ECOM.Infrastructure.Database.MainLogging.Migrations
                 name: "LanguageTranslationEntity");
 
             migrationBuilder.DropTable(
-                name: "Log");
-
-            migrationBuilder.DropTable(
                 name: "NotificationLink");
 
             migrationBuilder.DropTable(
-                name: "TransactionLog");
+                name: "SeedState");
 
             migrationBuilder.DropTable(
                 name: "ApplicationClaim");
@@ -512,6 +617,12 @@ namespace ECOM.Infrastructure.Database.MainLogging.Migrations
 
             migrationBuilder.DropTable(
                 name: "ApplicationUser");
+
+            migrationBuilder.DropTable(
+                name: "CurrencyExchangeRateSource");
+
+            migrationBuilder.DropTable(
+                name: "Currency");
 
             migrationBuilder.DropTable(
                 name: "LanguageKey");

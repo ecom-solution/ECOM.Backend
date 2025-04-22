@@ -174,6 +174,23 @@ namespace ECOM.Domain.Interfaces.DataContracts
 		/// <returns>The queryable object with the navigation property included.</returns>
 		IQueryable<TEntity> Include<TProperty>(Expression<Func<TEntity, TProperty>> navigationPropertyPath);
 
-		#endregion
-	}
+        /// <summary>
+        /// Applies ordering to the query based on the provided key selector.
+        /// </summary>
+        /// <typeparam name="TKey">The type of the key used for ordering.</typeparam>
+        /// <param name="query">The queryable object to order.</param>
+        /// <param name="keySelector">The expression to select the key for ordering.</param>
+        /// <returns>A new queryable object with the specified ordering applied.</returns>
+        IOrderedQueryable<TEntity> OrderBy<TKey>(IQueryable<TEntity> query, Expression<Func<TEntity, TKey>> keySelector);
+
+        /// <summary>
+        /// Applies descending ordering to the query based on the provided key selector.
+        /// </summary>
+        /// <typeparam name="TKey">The type of the key used for ordering.</typeparam>
+        /// <param name="query">The queryable object to order.</param>
+        /// <param name="keySelector">The expression to select the key for ordering.</param>
+        /// <returns>A new queryable object with the specified descending ordering applied.</returns>
+        IOrderedQueryable<TEntity> OrderByDescending<TKey>(IQueryable<TEntity> query, Expression<Func<TEntity, TKey>> keySelector);
+        #endregion
+    }
 }

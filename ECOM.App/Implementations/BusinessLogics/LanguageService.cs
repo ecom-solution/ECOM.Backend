@@ -53,13 +53,23 @@ namespace ECOM.App.Implementations.BusinessLogics
 				.Include(x => x.Avatar)
 				.OrderBy(x => x.Name);
 
-			return await _mainUnitOfWork.Repository<Language>().ToListAsync(query, x => new LanguageDto
+			var result = await _mainUnitOfWork.Repository<Language>().ToListAsync(query, x => new LanguageDto
+            {
+                Code = x.Code,
+                Name = x.Name,
+                IsDefault = x.IsDefault,
+                AvatarUrl = x.Avatar != null ? x.Avatar.FileUrl : null
+            });
+
+            var defaultLanguage = result.FirstOrDefault(x => x.IsDefault);
+			if (defaultLanguage == null)
 			{
-				Code = x.Code,
-				Name = x.Name,
-				IsDefault = x.Code == defaultLanguageCode,
-				AvatarUrl = x.Avatar != null ? x.Avatar.FileUrl : null
-			});
+				defaultLanguage = result.FirstOrDefault(x => x.Code == defaultLanguageCode);
+				if (defaultLanguage != null)
+					defaultLanguage.IsDefault = true;
+            }	
+
+            return result;
 		}
 
 		public async Task TestSendMailAsync()

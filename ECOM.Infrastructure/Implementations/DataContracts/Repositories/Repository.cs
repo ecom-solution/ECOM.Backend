@@ -108,14 +108,30 @@ namespace ECOM.Infrastructure.Implementations.DataContracts.Repositories
 			return _dbSet.Include(navigationPropertyPath);
 		}
 
-		#endregion
+        /// <inheritdoc/>
+        public IOrderedQueryable<TEntity> OrderBy<TKey>(IQueryable<TEntity> query, Expression<Func<TEntity, TKey>> keySelector)
+        {
+            ArgumentNullException.ThrowIfNull(query);
+            ArgumentNullException.ThrowIfNull(keySelector);
+            return query.OrderBy(keySelector);
+        }
 
-		#region 🔹 Dispose Pattern
+        /// <inheritdoc/>
+        public IOrderedQueryable<TEntity> OrderByDescending<TKey>(IQueryable<TEntity> query, Expression<Func<TEntity, TKey>> keySelector)
+        {
+            ArgumentNullException.ThrowIfNull(query);
+            ArgumentNullException.ThrowIfNull(keySelector);
+            return query.OrderByDescending(keySelector);
+        }
 
-		/// <summary>
-		/// Disposes the context and releases resources.
-		/// </summary>
-		public void Dispose()
+        #endregion
+
+        #region 🔹 Dispose Pattern
+
+        /// <summary>
+        /// Disposes the context and releases resources.
+        /// </summary>
+        public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);

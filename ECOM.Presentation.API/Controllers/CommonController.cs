@@ -2,23 +2,25 @@
 using ECOM.Shared.Library.Consts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
 
 namespace ECOM.Presentation.API.Controllers
 {
 	[ApiController]
 	[AllowAnonymous]
 	[Route("api/[controller]")]
-	public class CommonController(ILanguageService languageService) : ControllerBase
+	public class CommonController(
+		ILanguageService languageService,
+        ICurrencyService currencyService) : ControllerBase
 	{
 		private readonly ILanguageService _languageService = languageService;
+		private readonly ICurrencyService _currencyService = currencyService;
 
-		/// <summary>
-		/// Returns a list of available time zones with their IDs and display names.
-		/// Marks the default time zone based on ApplicationConstants.
-		/// </summary>
-		/// <returns>List of time zones with TimeZoneId, TimeZoneName, and IsDefault flag.</returns>
-		[HttpGet("timezones")]
+        /// <summary>
+        /// Returns a list of available time zones with their IDs and display names.
+        /// Marks the default time zone based on ApplicationConstants.
+        /// </summary>
+        /// <returns>List of time zones with TimeZoneId, TimeZoneName, and IsDefault flag.</returns>
+        [HttpGet("timezones")]
 		public IActionResult GetTimeZones()
 		{
 			var defaultTz = ApplicationConstants.DefaultTimeZoneId;
@@ -38,47 +40,21 @@ namespace ECOM.Presentation.API.Controllers
 			return Ok(timeZones);
 		}
 
-		/// <summary>
-		/// Returns a list of currencies with ISO codes, symbols, and display names.
-		/// Marks the default currency based on ApplicationConstants.
-		/// </summary>
-		/// <returns>List of currencies with CurrencyCode, CurrencySymbol, DisplayName, and IsDefault flag.</returns>
-		[HttpGet("currencies")]
-		public IActionResult GetCurrencies()
+        /// <summary>
+        /// Retrieves a list of currencies, including their ISO codes, symbols, and display names.
+        /// This endpoint also identifies and marks the default currency based on the configuration in ApplicationConstants.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IActionResult"/> representing the HTTP response.
+        /// Upon success, it returns an <see cref="OkObjectResult"/> containing a list of <see cref="CurrencyDto"/> objects.
+        /// Each <see cref="CurrencyDto"/> includes the currency's code, name, symbol, and a boolean flag indicating if it is the default currency.
+        /// </returns>
+        [HttpGet("currencies")]
+		public async Task<IActionResult> GetCurrencies()
 		{
-			var defaultCurrency = ApplicationConstants.DefaultCurrency;
-
-			var cultures = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
-
-			var currencyList = cultures
-				.Select(culture =>
-				{
-					try
-					{
-						if (string.IsNullOrWhiteSpace(culture.Name))
-							return null;
-
-						var region = new RegionInfo(culture.Name);
-						return new
-						{
-							CurrencyCode = region.ISOCurrencySymbol,   // ISO 4217 code (e.g., USD, VND)
-							CurrencySymbol = region.CurrencySymbol,    // Symbol (e.g., $, ₫)
-							DisplayName = region.CurrencyEnglishName,  // English name (e.g., Vietnamese Dong)
-							IsDefault = region.ISOCurrencySymbol == defaultCurrency
-						};
-					}
-					catch
-					{
-						return null;
-					}
-				})
-				.Where(x => x != null)
-				.DistinctBy(x => x!.CurrencyCode)
-				.OrderBy(x => x!.CurrencyCode)
-				.ToList();
-
-			return Ok(currencyList);
-		}
+			var result = await _currencyService.GetCurrenciesAsync();
+            return Ok(result);
+        }
 
 		/// <summary>
 		/// Gets all supported languages with basic metadata.

@@ -1,5 +1,6 @@
 ﻿using ECOM.Domain.Entities.MainLogging;
 using Microsoft.EntityFrameworkCore;
+using ECOM.Infrastructure.Database.MainLogging.Common;
 
 namespace ECOM.Infrastructure.Database.MainLogging
 {
@@ -10,9 +11,29 @@ namespace ECOM.Infrastructure.Database.MainLogging
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			modelBuilder.ApplyConfigurationsFromAssembly(typeof(MainLoggingDbContext).Assembly);
+            var applyMethod = typeof(ModelBuilder).GetMethods()
+                                                  .First(m => m.Name == nameof(ModelBuilder.ApplyConfiguration)
+                                                           && m.GetParameters().First().ParameterType.GetGenericTypeDefinition() == typeof(IEntityTypeConfiguration<>));
 
-			base.OnModelCreating(modelBuilder);
+            var configurations = typeof(MainLoggingDbContext).Assembly
+                .GetTypes()
+                .Where(t => t.IsClass && !t.IsAbstract)
+                .Where(t => typeof(MainLoggingConfiguration).IsAssignableFrom(t))
+                .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntityTypeConfiguration<>)))
+                .ToList();
+
+            foreach (var configType in configurations)
+            {
+                var interfaceType = configType.GetInterfaces()
+                    .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntityTypeConfiguration<>));
+
+                var entityType = interfaceType.GetGenericArguments().First();
+                var configInstance = Activator.CreateInstance(configType);
+                var genericMethod = applyMethod.MakeGenericMethod(entityType);
+                genericMethod.Invoke(modelBuilder, [configInstance]);
+            }
+
+            base.OnModelCreating(modelBuilder);
 		}
 	}
 }

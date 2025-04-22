@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ECOM.Infrastructure.Database.Main.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20250418062324_InitialMainDbContext")]
+    [Migration("20250422093702_InitialMainDbContext")]
     partial class InitialMainDbContext
     {
         /// <inheritdoc />
@@ -264,6 +264,29 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
                     b.ToTable("ApplicationUserLogin", (string)null);
                 });
 
+            modelBuilder.Entity("ECOM.Domain.Entities.Main.ApplicationUserNotification", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("NotificationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsSeen")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("SeenDate_Utc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("UserId", "NotificationId");
+
+                    b.HasIndex("NotificationId");
+
+                    b.ToTable("ApplicationUserNotification", (string)null);
+                });
+
             modelBuilder.Entity("ECOM.Domain.Entities.Main.ApplicationUserRole", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -303,6 +326,141 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
                     b.HasKey("UserId", "Provider", "TokenName");
 
                     b.ToTable("ApplicationUserToken", (string)null);
+                });
+
+            modelBuilder.Entity("ECOM.Domain.Entities.Main.Currency", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<int>("CurrencySymbolPosition")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("DecimalDigits")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(2);
+
+                    b.Property<string>("DecimalSeparator")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.Property<bool>("IsDefault")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("ThousandsSeparator")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Currency", (string)null);
+                });
+
+            modelBuilder.Entity("ECOM.Domain.Entities.Main.CurrencyExchangeRate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CurrencyExchangeRateSourceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FromCurrencyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("LastUpdatedDate_Utc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Rate")
+                        .HasColumnType("decimal(18, 6)");
+
+                    b.Property<Guid>("ToCurrencyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CurrencyExchangeRateSourceId");
+
+                    b.HasIndex("FromCurrencyId");
+
+                    b.HasIndex("ToCurrencyId");
+
+                    b.HasIndex("FromCurrencyId", "ToCurrencyId")
+                        .IsUnique();
+
+                    b.ToTable("CurrencyExchangeRate", (string)null);
+                });
+
+            modelBuilder.Entity("ECOM.Domain.Entities.Main.CurrencyExchangeRateSource", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ApiKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ApiSecret")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Configuration")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("UpdateIntervalSeconds")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(3600);
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CurrencyExchangeRateSource", (string)null);
                 });
 
             modelBuilder.Entity("ECOM.Domain.Entities.Main.FileEntity", b =>
@@ -365,6 +523,11 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
                         .HasMaxLength(2)
                         .IsUnicode(false)
                         .HasColumnType("varchar(2)");
+
+                    b.Property<bool>("IsDefault")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -505,14 +668,15 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notification");
+                    b.ToTable("Notification", (string)null);
                 });
 
             modelBuilder.Entity("ECOM.Domain.Entities.Main.NotificationLink", b =>
@@ -529,7 +693,8 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
 
                     b.Property<string>("Label")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("LastUpdatedAt_Utc")
                         .HasColumnType("datetime2");
@@ -545,13 +710,39 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NotificationId");
 
-                    b.ToTable("NotificationLink");
+                    b.ToTable("NotificationLink", (string)null);
+                });
+
+            modelBuilder.Entity("ECOM.Domain.Entities.Main.SeedState", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CurrentHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastSeededAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SeedName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SeedState");
                 });
 
             modelBuilder.Entity("ECOM.Domain.Entities.Main.ApplicationRoleClaim", b =>
@@ -613,6 +804,25 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ECOM.Domain.Entities.Main.ApplicationUserNotification", b =>
+                {
+                    b.HasOne("ECOM.Domain.Entities.Main.Notification", "Notification")
+                        .WithMany("UserNotifications")
+                        .HasForeignKey("NotificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECOM.Domain.Entities.Main.ApplicationUser", "User")
+                        .WithMany("UserNotifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Notification");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ECOM.Domain.Entities.Main.ApplicationUserRole", b =>
                 {
                     b.HasOne("ECOM.Domain.Entities.Main.ApplicationRole", "Role")
@@ -643,6 +853,33 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ECOM.Domain.Entities.Main.CurrencyExchangeRate", b =>
+                {
+                    b.HasOne("ECOM.Domain.Entities.Main.CurrencyExchangeRateSource", "CurrencyExchangeRateSource")
+                        .WithMany()
+                        .HasForeignKey("CurrencyExchangeRateSourceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ECOM.Domain.Entities.Main.Currency", "FromCurrency")
+                        .WithMany()
+                        .HasForeignKey("FromCurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ECOM.Domain.Entities.Main.Currency", "ToCurrency")
+                        .WithMany()
+                        .HasForeignKey("ToCurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CurrencyExchangeRateSource");
+
+                    b.Navigation("FromCurrency");
+
+                    b.Navigation("ToCurrency");
+                });
+
             modelBuilder.Entity("ECOM.Domain.Entities.Main.Language", b =>
                 {
                     b.HasOne("ECOM.Domain.Entities.Main.FileEntity", "Avatar")
@@ -657,7 +894,8 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
                 {
                     b.HasOne("ECOM.Domain.Entities.Main.LanguageComponent", "Parent")
                         .WithMany("Children")
-                        .HasForeignKey("ParentId");
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Parent");
                 });
@@ -734,6 +972,8 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
 
                     b.Navigation("UserLogins");
 
+                    b.Navigation("UserNotifications");
+
                     b.Navigation("UserRoles");
 
                     b.Navigation("UserTokens");
@@ -768,6 +1008,8 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
             modelBuilder.Entity("ECOM.Domain.Entities.Main.Notification", b =>
                 {
                     b.Navigation("NotificationLinks");
+
+                    b.Navigation("UserNotifications");
                 });
 #pragma warning restore 612, 618
         }

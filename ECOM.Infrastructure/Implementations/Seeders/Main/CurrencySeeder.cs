@@ -1,4 +1,9 @@
-﻿using ECOM.App.Interfaces.Loggings;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using ECOM.App.Interfaces.Loggings;
 using ECOM.Domain.Entities.Main;
 using ECOM.Domain.Interfaces.DataContracts;
 using ECOM.Shared.Library.Consts;
@@ -8,19 +13,19 @@ using Microsoft.Extensions.Options;
 
 namespace ECOM.Infrastructure.Implementations.Seeders.Main
 {
-	public class ApplicationRoleSeeder(
-		ILog logger,
-		IOptions<AppSettings> appSettings,
-		[FromKeyedServices(DatabaseConstants.Main)] IUnitOfWork mainUnitOfWork) : DbSeeder(logger, appSettings, mainUnitOfWork)
-	{
-        private const string SeedFileName = "ApplicationRole.json";
+    public class CurrencySeeder(
+        ILog logger,
+        IOptions<AppSettings> appSettings,
+        [FromKeyedServices(DatabaseConstants.Main)] IUnitOfWork mainUnitOfWork) : DbSeeder(logger, appSettings, mainUnitOfWork)
+    {
+        private const string SeedFileName = "Currency.json";
         private readonly string _seedFilePath = Path.Combine("ECOM.Infrastructure.Database", "Main", "Seeds", SeedFileName);
-        private const string SeedName = "ApplicationRole";
+        private const string SeedName = "Currency";
         private const int PartialHashBytes = 4096;
-        public override int Priority => 1;
 
-		public override async Task SeedAsync()
-		{
+        public override int Priority => 1;
+        public override async Task SeedAsync()
+        {
             var currentHash = await CalculatePartialFileHashAsync(_seedFilePath, PartialHashBytes);
             var lastModified = File.GetLastWriteTimeUtc(_seedFilePath);
 
@@ -29,15 +34,15 @@ namespace ECOM.Infrastructure.Implementations.Seeders.Main
 
             if (existingSeedState == null || existingSeedState.CurrentHash != currentHash || existingSeedState.LastModifiedAtUtc < lastModified)
             {
-                _logger.Information($"ApplicationRole seed data has changed or not yet seeded. Starting seeding...");
+                _logger.Information($"Currency seed data has changed or not yet seeded. Starting seeding...");
 
-                var roles = await ReadAsync<ApplicationRole>(_seedFilePath);
+                var currencies = await ReadAsync<Currency>(_seedFilePath);
 
-                if (roles.Count > 0)
+                if (currencies.Count > 0)
                 {
-                    _logger.Information($"Seeding ApplicationRoles");
-                    await _mainUnitOfWork.BulkUpsertAsync(roles, _appSettings.DbContext.Bulk.BatchSize, _appSettings.DbContext.Bulk.CmdTimeOutInMiliseconds);
-                    _logger.Information($"Seeded {roles.Count} ApplicationRoles");
+                    _logger.Information($"Seeding Currency...");
+                    await _mainUnitOfWork.BulkUpsertAsync(currencies, _appSettings.DbContext.Bulk.BatchSize, _appSettings.DbContext.Bulk.CmdTimeOutInMiliseconds);
+                    _logger.Information($"Seeded {currencies.Count} currencies");
 
                     // Update seedstate in database
                     if (existingSeedState == null)
@@ -58,17 +63,17 @@ namespace ECOM.Infrastructure.Implementations.Seeders.Main
                         seedStateRepository.Update(existingSeedState);
                     }
                     await _mainUnitOfWork.SaveChangesAsync();
-                    _logger.Information($"ApplicationRole seed state updated in the database.");
+                    _logger.Information($"Currency seed state updated in the database.");
                 }
                 else
                 {
-                    _logger.Warning($"ApplicationRole seed file '{SeedFileName}' is empty.");
+                    _logger.Warning($"Currency seed file '{SeedFileName}' is empty.");
                 }
             }
             else
             {
-                _logger.Information($"ApplicationRole seed data has not changed since {existingSeedState.LastSeededAtUtc.ToLocalTime()} (last modified: {existingSeedState.LastModifiedAtUtc?.ToLocalTime()}). Skipping seeding.");
+                _logger.Information($"Currency seed data has not changed since {existingSeedState.LastSeededAtUtc.ToLocalTime()} (last modified: {existingSeedState.LastModifiedAtUtc?.ToLocalTime()}). Skipping seeding.");
             }
         }
-	}
+    }
 }
