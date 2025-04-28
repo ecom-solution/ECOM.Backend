@@ -1,12 +1,12 @@
 using Serilog;
-using ECOM.App.Extenstions;
+using ECOM.App.Extensions;
 using ECOM.Infrastructure.Extensions;
-using ECOM.Infrastructure.Implementations.Notifications.SignalR;
 
 using ECOM.Presentation.API.Extensions;
 using ECOM.Presentation.API.Middlewares;
 using ECOM.Shared.Library.Models.Settings;
 using ECOM.Shared.Library.Consts;
+using ECOM.Infrastructure.Implementations.Notifications.SignalR.Hubs;
 
 
 var builder = WebApplication.CreateBuilder(args); 
@@ -25,6 +25,9 @@ builder.Services.AddOptions<AppSettings>()
 
 // Add Controllers
 builder.Services.AddControllers();
+
+// Add HttpContextAccessor to use IHttpContextAccessor
+builder.Services.AddHttpContextAccessor();
 
 // Add Default Cors Policy
 builder.Services.AddDefaultCorsPolicy(builder.Configuration);

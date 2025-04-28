@@ -1,4 +1,4 @@
-﻿using ECOM.App.Extenstions;
+﻿using ECOM.App.Extensions;
 using ECOM.App.Implementations.BusinessLogics.Common;
 using ECOM.App.Interfaces.BusinessLogics;
 using ECOM.Domain.Interfaces.Hashs;
@@ -21,17 +21,18 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using ECOM.App.Interfaces.Users;
 
 namespace ECOM.App.Implementations.BusinessLogics
 {
 	public class AuthService(
 		ILog logger,
 		IOptions<AppSettings> appSettings,
-		[FromKeyedServices(DatabaseConstants.Main)] IUnitOfWork mainUnitOfWork, 
-		[FromKeyedServices(DatabaseConstants.MainLogging)] IUnitOfWork loggingUnitOfWork,
+		[FromKeyedServices(DatabaseConstants.Main)] IUnitOfWork mainUnitOfWork,
+		ICurrentUserAccessor currentUserAccessor,
 		IPasswordHasher passwordHasher,
 		ITotpService totpService) 
-		: BaseService(logger, appSettings, mainUnitOfWork, loggingUnitOfWork), IAuthService
+		: BaseService(logger, appSettings, mainUnitOfWork, currentUserAccessor), IAuthService
 	{
 		private readonly IPasswordHasher _passwordHasher = passwordHasher;
 		private readonly ITotpService _totpService = totpService;

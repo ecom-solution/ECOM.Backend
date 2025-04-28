@@ -13,12 +13,6 @@
         public LanguageKey() { }
 
         /// <summary>
-        /// Gets or sets the unique identifier of the <see cref="LanguageComponent"/> to which this language key belongs.
-        /// This helps in organizing related translation keys.
-        /// </summary>
-        public Guid LanguageComponentId { get; set; }
-
-        /// <summary>
         /// Gets or sets the unique key string used to identify this translatable text (e.g., "product.name", "button.submit").
         /// This key is used to retrieve the appropriate translation for a given language.
         /// Defaults to an empty string.
@@ -31,11 +25,6 @@
         /// Nullable.
         /// </summary>
         public string? Description { get; set; }
-
-        /// <summary>
-        /// Navigation property to the <see cref="LanguageComponent"/> entity that this language key belongs to.
-        /// </summary>
-        public virtual LanguageComponent? LanguageComponent { get; set; }
 
         /// <summary>
         /// Navigation property to the collection of <see cref="LanguageTranslation"/> entities associated with this language key.

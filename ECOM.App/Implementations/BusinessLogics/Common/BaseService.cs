@@ -1,4 +1,6 @@
-﻿using ECOM.App.Interfaces.Loggings;
+﻿using System.Text.Json;
+using ECOM.App.Interfaces.Loggings;
+using ECOM.App.Interfaces.Users;
 using ECOM.Domain.Interfaces.DataContracts;
 using ECOM.Shared.Library.Consts;
 using ECOM.Shared.Library.Models.Settings;
@@ -11,11 +13,17 @@ namespace ECOM.App.Implementations.BusinessLogics.Common
         (ILog logger,
 		IOptions<AppSettings> appSettings,
 		[FromKeyedServices(DatabaseConstants.Main)] IUnitOfWork mainUnitOfWork,
-		[FromKeyedServices(DatabaseConstants.MainLogging)] IUnitOfWork loggingUnitOfWork)
+        ICurrentUserAccessor currentUserAccessor)
     {
         protected readonly ILog _logger = logger;
 		protected readonly AppSettings _appSettings = appSettings.Value;
 		protected readonly IUnitOfWork _mainUnitOfWork = mainUnitOfWork;
-		protected readonly IUnitOfWork _loggingUnitOfWork = loggingUnitOfWork;
+		protected readonly ICurrentUserAccessor _currentUserAccessor = currentUserAccessor;
+
+        protected static JsonSerializerOptions JsonSerializerOptions 
+            => new() { 
+                WriteIndented = true,
+                
+            };
     }
 }

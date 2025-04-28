@@ -1,6 +1,7 @@
 ﻿using ECOM.App.Implementations.BusinessLogics.Common;
 using ECOM.App.Interfaces.BusinessLogics;
 using ECOM.App.Interfaces.Loggings;
+using ECOM.App.Interfaces.Users;
 using ECOM.Domain.Entities.Main;
 using ECOM.Domain.Interfaces.DataContracts;
 using ECOM.Shared.Library.Consts;
@@ -14,8 +15,8 @@ namespace ECOM.App.Implementations.BusinessLogics
     public class CurrencyService(
         ILog logger, IOptions<AppSettings> appSettings,
         [FromKeyedServices("Main")] IUnitOfWork mainUnitOfWork,
-        [FromKeyedServices("MainLogging")] IUnitOfWork loggingUnitOfWork)
-        : BaseService(logger, appSettings, mainUnitOfWork, loggingUnitOfWork), ICurrencyService
+        ICurrentUserAccessor currentUserAccessor)
+        : BaseService(logger, appSettings, mainUnitOfWork, currentUserAccessor), ICurrencyService
     {
         /// <inheritdoc/>
         public async Task<List<CurrencyDto>> GetCurrenciesAsync()

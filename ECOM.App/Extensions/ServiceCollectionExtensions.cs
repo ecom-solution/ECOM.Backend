@@ -1,7 +1,11 @@
 ﻿using ECOM.App.Implementations.BusinessLogics.Common;
+using ECOM.App.Implementations.Users;
+using ECOM.App.Interfaces.Users;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace ECOM.App.Extenstions
+namespace ECOM.App.Extensions
 {
 	public static class ServiceCollectionExtensions
 	{
@@ -12,7 +16,11 @@ namespace ECOM.App.Extenstions
 		/// <param name="services">The DI container to add services to.</param>
 		public static IServiceCollection AddApplicationServices(this IServiceCollection services)
 		{
-			var baseServiceType = typeof(BaseService);
+            services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
+
+			//-----------------------------------------------------------------------
+
+            var baseServiceType = typeof(BaseService);
 
 			// Load the assembly where BaseService is defined
 			var assembly = baseServiceType.Assembly;
@@ -33,7 +41,7 @@ namespace ECOM.App.Extenstions
 				}
 			}
 
-			return services;
+            return services;
 		}
 	}
 }

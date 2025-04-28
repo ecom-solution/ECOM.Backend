@@ -8,8 +8,9 @@
 		public StorageSetting Storage { get; set; } = new StorageSetting();
 		public LoggingSetting Logging { get; set; } = new LoggingSetting();
 		public RabbitMQSetting RabbitMQ { get; set; } = new RabbitMQSetting();
+		public SignalIRSetting SignalIR { get; set; } = new SignalIRSetting();
 
-		public class AuthenticationSetting
+        public class AuthenticationSetting
 		{
 			public int MaxVerifyFailedCount { get; set; } = 0;
 			public int MaxAccessFailedCount { get; set; } = 0;
@@ -158,6 +159,17 @@
 			/// Example: "notify-queue-dlq"
 			/// </summary>
 			public string NotifyQueueDLQ { get; set; } = string.Empty;
-		}
+
+			public string LocalizationContentGenerateQueue { get; set; } = string.Empty;
+
+            public string LocalizationContentGenerateQueueDLQ { get; set; } = string.Empty;
+
+        }
+	
+		public class SignalIRSetting
+		{
+			public string ReceiveMethod { get; set; } = string.Empty;
+
+        }
 	}
 }

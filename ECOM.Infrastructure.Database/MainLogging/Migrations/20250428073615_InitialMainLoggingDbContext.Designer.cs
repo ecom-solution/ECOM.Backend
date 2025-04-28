@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ECOM.Infrastructure.Database.MainLogging.Migrations
 {
     [DbContext(typeof(MainLoggingDbContext))]
-    [Migration("20250422095521_InitialMainLoggingDbContext")]
+    [Migration("20250428073615_InitialMainLoggingDbContext")]
     partial class InitialMainLoggingDbContext
     {
         /// <inheritdoc />

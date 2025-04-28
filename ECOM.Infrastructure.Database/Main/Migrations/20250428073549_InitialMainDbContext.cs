@@ -96,22 +96,16 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LanguageComponent",
+                name: "LanguageKey",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ComponentName = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
+                    Key = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LanguageComponent", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_LanguageComponent_LanguageComponent_ParentId",
-                        column: x => x.ParentId,
-                        principalTable: "LanguageComponent",
-                        principalColumn: "Id");
+                    table.PrimaryKey("PK_LanguageKey", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -274,26 +268,6 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LanguageKey",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LanguageComponentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Key = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LanguageKey", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_LanguageKey_LanguageComponent_LanguageComponentId",
-                        column: x => x.LanguageComponentId,
-                        principalTable: "LanguageComponent",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "NotificationLink",
                 columns: table => new
                 {
@@ -433,27 +407,6 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LanguageTranslationEntity",
-                columns: table => new
-                {
-                    LanguageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EntityName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    EntityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FieldName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LanguageTranslationEntity", x => new { x.LanguageId, x.EntityName, x.EntityId, x.FieldName });
-                    table.ForeignKey(
-                        name: "FK_LanguageTranslationEntity_Language_LanguageId",
-                        column: x => x.LanguageId,
-                        principalTable: "Language",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "LanguageTranslation",
                 columns: table => new
                 {
@@ -472,6 +425,27 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_LanguageTranslation_Language_LanguageId",
+                        column: x => x.LanguageId,
+                        principalTable: "Language",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LanguageTranslationEntity",
+                columns: table => new
+                {
+                    LanguageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EntityName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    EntityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FieldName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LanguageTranslationEntity", x => new { x.LanguageId, x.EntityName, x.EntityId, x.FieldName });
+                    table.ForeignKey(
+                        name: "FK_LanguageTranslationEntity_Language_LanguageId",
                         column: x => x.LanguageId,
                         principalTable: "Language",
                         principalColumn: "Id",
@@ -547,22 +521,6 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_LanguageComponent_ComponentName",
-                table: "LanguageComponent",
-                column: "ComponentName",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_LanguageComponent_ParentId",
-                table: "LanguageComponent",
-                column: "ParentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_LanguageKey_LanguageComponentId",
-                table: "LanguageKey",
-                column: "LanguageComponentId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_LanguageTranslation_LanguageKeyId",
                 table: "LanguageTranslation",
                 column: "LanguageKeyId");
@@ -632,9 +590,6 @@ namespace ECOM.Infrastructure.Database.Main.Migrations
 
             migrationBuilder.DropTable(
                 name: "Notification");
-
-            migrationBuilder.DropTable(
-                name: "LanguageComponent");
 
             migrationBuilder.DropTable(
                 name: "FileEntity");

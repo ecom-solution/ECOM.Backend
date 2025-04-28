@@ -1,7 +1,7 @@
 ﻿using ECOM.Domain.Entities.Main;
 using ECOM.Domain.Interfaces.DataContracts;
 
-namespace ECOM.App.Extenstions
+namespace ECOM.App.Extensions
 {
 	public static class UserExtensions
 	{

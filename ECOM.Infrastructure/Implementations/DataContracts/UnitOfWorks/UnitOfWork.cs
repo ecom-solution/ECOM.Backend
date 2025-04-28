@@ -18,7 +18,7 @@ namespace ECOM.Infrastructure.Implementations.DataContracts.UnitOfWorks
 			if (_repositories.TryGetValue(typeof(TEntity), out var repo))
 				return (IRepository<TEntity>)repo;
 
-			var repository = new Repository<TEntity>(_context);
+			var repository = new EfCoreRepository<TEntity>(_context);
 			_repositories[typeof(TEntity)] = repository;
 			return repository;
 		}

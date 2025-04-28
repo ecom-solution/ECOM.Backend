@@ -1,6 +1,5 @@
 ﻿using ECOM.App.Interfaces.BusinessLogics;
 using ECOM.App.Interfaces.Loggings;
-using ECOM.Shared.Library.Consts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECOM.Presentation.API.Controllers
@@ -20,27 +19,12 @@ namespace ECOM.Presentation.API.Controllers
 		/// <param name="languageCode">Language code (e.g., vi, en)</param>
 		/// <param name="rootComponent">Root component name</param>
 		/// <returns>Localization content JSON</returns>
-		[HttpGet("get-translations")]
-		public async Task<IActionResult> GetTranslationsAsync(
-			[FromQuery] string languageCode,
-			[FromQuery] string rootComponent)
+		[HttpPost("generate-translations")]
+		public async Task<IActionResult> GenerateTranslationsAsync([FromQuery] string[] languageCodes)
 		{
-			if (string.IsNullOrWhiteSpace(languageCode))
-				return BadRequest("LanguageCode is required.");
-
-			if (string.IsNullOrWhiteSpace(rootComponent))
-				return BadRequest("RootComponent is required.");
-
-			var jsonContent = await _languageService.GenerateLocalizationContentAsync(languageCode, rootComponent);
-
-			return Content(jsonContent, FileContentType.Json);
-		}
-
-		[HttpGet("test-sendmail")]
-		public async Task<IActionResult> TestSendMailAsync()
-		{
-			await _languageService.TestSendMailAsync();
+			await _languageService.GenerateLocalizationContentAsync(languageCodes);
 			return Ok();
-		}
+        }
+
 	}
 }

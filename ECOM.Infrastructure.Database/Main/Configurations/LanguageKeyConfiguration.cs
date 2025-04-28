@@ -25,12 +25,6 @@ namespace ECOM.Infrastructure.Database.Main.Configurations
             builder.Property(x => x.Key).HasMaxLength(500).IsRequired(); // Configures the "Key" property: maximum length 500 and required (the unique identifier for a translatable string)
             builder.Property(x => x.Description).HasMaxLength(500); // Configures the "Description" property: maximum length 500 (optional context for the key)
 
-            // Configures the one-to-many relationship between LanguageKey and LanguageComponent
-            builder.HasOne(x => x.LanguageComponent) // LanguageKey belongs to one LanguageComponent
-                .WithMany(x => x.LanguageKeys) // LanguageComponent has many LanguageKeys
-                .HasForeignKey(x => x.LanguageComponentId) // Defines the foreign key "LanguageComponentId" in the LanguageKey table
-                .OnDelete(DeleteBehavior.Cascade); // Configures the delete behavior: when a LanguageComponent is deleted, all associated LanguageKeys are also deleted
-
             // Configures the one-to-many relationship between LanguageKey and LanguageTranslation
             builder.HasMany(x => x.LanguageTranslations) // LanguageKey has many LanguageTranslations
                 .WithOne(x => x.LanguageKey) // Each LanguageTranslation belongs to one LanguageKey

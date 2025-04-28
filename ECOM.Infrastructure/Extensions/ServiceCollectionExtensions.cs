@@ -14,7 +14,6 @@ using ECOM.Infrastructure.Implementations.Hashs;
 using ECOM.Infrastructure.Implementations.Mappings;
 using ECOM.Infrastructure.Implementations.Messagings;
 using ECOM.Infrastructure.Implementations.Messagings.Consumers;
-using ECOM.Infrastructure.Implementations.Notifications.SignalR;
 using ECOM.Infrastructure.Implementations.OTPs;
 using ECOM.Infrastructure.Implementations.Seeders;
 using ECOM.Shared.Library.Consts;
@@ -26,6 +25,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Minio;
 using System.Reflection;
+using ECOM.Infrastructure.Implementations.Notifications.SignalR.Providers;
+using ECOM.Infrastructure.Implementations.Notifications.SignalR.Hubs;
+using ECOM.Infrastructure.Implementations.Notifications.SignalR;
+using ECOM.Domain.Interfaces.Storages;
+using ECOM.Infrastructure.Implementations.Storages;
 
 namespace ECOM.Infrastructure.Extensions
 {
@@ -43,10 +47,10 @@ namespace ECOM.Infrastructure.Extensions
 			var storageSettings = appSettings.Storage;
 
 			// Register DbContexts
-			services.AddDbContext<MainDbContext>(options =>
+			services.AddDbContextPool<MainDbContext>(options =>
 				options.UseSqlServer(configuration.GetConnectionString(nameof(MainDbContext))));
 
-			services.AddDbContext<MainLoggingDbContext>(options =>
+			services.AddDbContextPool<MainLoggingDbContext>(options =>
 				options.UseSqlServer(configuration.GetConnectionString(nameof(MainLoggingDbContext))));
 
 			// Register UnitOfWork with keyed DI
@@ -79,9 +83,12 @@ namespace ECOM.Infrastructure.Extensions
 					.Build();
 			});
 
+            // Register MinIOStorage
+            services.AddScoped<IStorage, MinIOStorage>();
+
 			// Register email and notification services
 			services.AddScoped<IEmailSender, ZohoEmailSender>();
-			services.AddScoped<INotificationSender, SignalRNotificationSender>();
+			services.AddScoped<INotificationSender, SignalRNotificationSender<NotificationHub>>();
 
 			// Configure SignalR and user ID provider
 			services.AddSignalR();
@@ -94,6 +101,7 @@ namespace ECOM.Infrastructure.Extensions
 				// Register consumers
 				x.AddConsumer<EmailConsumer>();
 				x.AddConsumer<NotificationConsumer>();
+				x.AddConsumer<LocalizationContentGenerateConsumer>();
 
 				x.UsingRabbitMq((context, cfg) =>
 				{
@@ -117,7 +125,13 @@ namespace ECOM.Infrastructure.Extensions
 						e.ConfigureConsumer<NotificationConsumer>(context);
 						e.BindDeadLetterQueue(rabbitSettings.NotifyQueueDLQ);
 					});
-				});
+
+                    cfg.ReceiveEndpoint(rabbitSettings.LocalizationContentGenerateQueue, e =>
+                    {
+                        e.ConfigureConsumer<LocalizationContentGenerateConsumer>(context);
+                        e.BindDeadLetterQueue(rabbitSettings.LocalizationContentGenerateQueueDLQ);
+                    });
+                });
 			});
 
 			// Register PasswordHasher

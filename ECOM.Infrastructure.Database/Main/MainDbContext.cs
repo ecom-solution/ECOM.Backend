@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECOM.Infrastructure.Database.Main
 {
-    public class MainDbContext(DbContextOptions<MainDbContext> options) : DbContext(options)
+	public class MainDbContext(DbContextOptions<MainDbContext> options) : DbContext(options)
 	{
 		public virtual DbSet<ApplicationClaim> ApplicationClaim { get; set; }
 		public virtual DbSet<ApplicationRole> ApplicationRole { get; set; }
@@ -14,13 +14,13 @@ namespace ECOM.Infrastructure.Database.Main
 		public virtual DbSet<ApplicationUserRole> ApplicationUserRole { get; set; }
 		public virtual DbSet<ApplicationUserLogin> ApplicationUserLogin { get; set; }
 		public virtual DbSet<ApplicationUserNotification> ApplicationUserNotification { get; set; }
-        public virtual DbSet<ApplicationUserToken> ApplicationUserToken { get; set; }
+		public virtual DbSet<ApplicationUserToken> ApplicationUserToken { get; set; }
 
 		public virtual DbSet<Currency> Currency { get; set; }
 		public virtual DbSet<CurrencyExchangeRate> CurrencyExchangeRate { get; set; }
-        public virtual DbSet<CurrencyExchangeRateSource> CurrencyExchangeRateSource { get; set; }
+		public virtual DbSet<CurrencyExchangeRateSource> CurrencyExchangeRateSource { get; set; }
 
-        public virtual DbSet<FileEntity> FileEntity { get; set; }
+		public virtual DbSet<FileEntity> FileEntity { get; set; }
 
 		public virtual DbSet<Language> Language { get; set; }
 		public virtual DbSet<LanguageKey> LanguageKey { get; set; }
@@ -33,7 +33,7 @@ namespace ECOM.Infrastructure.Database.Main
 		public virtual DbSet<SeedState> SeedState { get; set; }
 
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			var applyMethod = typeof(ModelBuilder).GetMethods()
 												  .First(m => m.Name == nameof(ModelBuilder.ApplyConfiguration)

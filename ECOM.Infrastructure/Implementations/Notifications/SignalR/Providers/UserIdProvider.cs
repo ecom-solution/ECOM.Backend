@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
-namespace ECOM.Infrastructure.Implementations.Notifications.SignalR
+namespace ECOM.Infrastructure.Implementations.Notifications.SignalR.Providers
 {
 	public class UserIdProvider : IUserIdProvider
 	{

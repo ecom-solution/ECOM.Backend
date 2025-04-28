@@ -2,177 +2,200 @@
 
 namespace ECOM.Domain.Interfaces.DataContracts
 {
-	public interface IRepository<TEntity> : IDisposable, IAsyncDisposable
-	{
-		#region 🔹 Create (Insert)
+    public interface IRepository<TEntity> : IDisposable, IAsyncDisposable
+    {
+        #region 🔹 Creation
 
-		/// <summary>
-		/// Insert a new entity.
-		/// </summary>
-		/// <param name="entity">The entity to insert.</param>
-		void Insert(TEntity entity);
+        /// <summary>
+        /// Insert a new entity.
+        /// </summary>
+        /// <param name="entity">The entity to insert.</param>
+        void Insert(TEntity entity);
 
-		/// <summary>
-		/// Insert multiple entities.
-		/// </summary>
-		/// <param name="entities">The collection of entities to insert.</param>
-		void InsertRange(IEnumerable<TEntity> entities);
+        /// <summary>
+        /// Insert multiple entities.
+        /// </summary>
+        /// <param name="entities">The collection of entities to insert.</param>
+        void InsertRange(IEnumerable<TEntity> entities);
 
-		/// <summary>
-		/// Insert a new entity asynchronously.
-		/// </summary>
-		/// <param name="entity">The entity to insert.</param>
-		Task InsertAsync(TEntity entity);
+        /// <summary>
+        /// Insert a new entity asynchronously.
+        /// </summary>
+        /// <param name="entity">The entity to insert.</param>
+        Task InsertAsync(TEntity entity);
 
-		/// <summary>
-		/// Insert multiple entities asynchronously.
-		/// </summary>
-		/// <param name="entities">The collection of entities to insert.</param>
-		Task InsertRangeAsync(IEnumerable<TEntity> entities);
+        /// <summary>
+        /// Insert multiple entities asynchronously.
+        /// </summary>
+        /// <param name="entities">The collection of entities to insert.</param>
+        Task InsertRangeAsync(IEnumerable<TEntity> entities);
 
-		#endregion
+        #endregion
 
-		#region 🔹 Read (Retrieve)
+        #region 🔹 Retrieval (Synchronous)
 
-		/// <summary>
-		/// Get all entities.
-		/// </summary>
-		/// <returns>A collection of all entities.</returns>
-		IQueryable<TEntity> Query(bool isNoTracking = false);
+        /// <summary>
+        /// Get all entities.
+        /// </summary>
+        /// <param name="isNoTracking">Indicates if the entities should not be tracked by the context.</param>
+        /// <returns>An <see cref="IQueryable{TEntity}"/> of all entities.</returns>
+        IQueryable<TEntity> Query(bool isNoTracking = false);
 
-		/// <summary>
-		/// Get entities that match a given condition.
-		/// </summary>
-		/// <param name="predicate">The condition to filter entities.</param>
-		IQueryable<TEntity> Where(Expression<Func<TEntity, bool>> predicate, bool isNoTracking = false);
+        /// <summary>
+        /// Get entities that match a given condition.
+        /// </summary>
+        /// <param name="predicate">The condition to filter entities.</param>
+        /// <param name="isNoTracking">Indicates if the entities should not be tracked by the context.</param>
+        /// <returns>An <see cref="IQueryable{TEntity}"/> of entities that match the condition.</returns>
+        IQueryable<TEntity> Where(Expression<Func<TEntity, bool>> predicate, bool isNoTracking = false);
 
-		/// <summary>
-		/// Get an entity by its ID asynchronously.
-		/// </summary>
-		/// <param name="id">The ID of the entity.</param>
-		/// <returns>The entity if found, otherwise null.</returns>
-		Task<TEntity?> GetByIdAsync(Guid id);
+        #endregion
 
-		/// <summary>
-		/// Get all entities asynchronously.
-		/// </summary>
-		/// <returns>A collection of all entities.</returns>
-		Task<IEnumerable<TEntity>> GetAllAsync();
+        #region 🔹 Retrieval (Asynchronous - Single Result)
 
-		/// <summary>
-		/// Find entities based on a predicate asynchronously.
-		/// </summary>
-		/// <param name="predicate">The condition to filter entities.</param>
-		Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
+        /// <summary>
+        /// Get an entity by its ID asynchronously.
+        /// </summary>
+        /// <param name="id">The ID of the entity.</param>
+        /// <returns>The entity if found, otherwise null.</returns>
+        Task<TEntity?> GetByIdAsync(Guid id);
 
-		/// <summary>
-		/// Get the first entity matching the condition asynchronously.
-		/// </summary>
-		/// <param name="predicate">The condition to filter entities.</param>
-		Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
+        /// <summary>
+        /// Get the first entity matching the condition asynchronously.
+        /// </summary>
+        /// <param name="predicate">The condition to filter entities.</param>
+        /// <returns>The first entity if found, otherwise null.</returns>
+        Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
 
-		#endregion
+        /// <summary>
+        /// Returns the first element in the query or null if no elements match asynchronously.
+        /// </summary>
+        /// <param name="query">The queryable object to evaluate.</param>
+        /// <returns>The first entity if found, otherwise null.</returns>
+        Task<TEntity?> FirstOrDefaultAsync(IQueryable<TEntity> query);
 
-		#region 🔹 Update
+        #endregion
 
-		/// <summary>
-		/// Update an existing entity.
-		/// </summary>
-		/// <param name="entity">The entity to update.</param>
-		void Update(TEntity entity);
+        #region 🔹 Retrieval (Asynchronous - Collection)
 
-		/// <summary>
-		/// Update multiple entities.
-		/// </summary>
-		/// <param name="entities">The collection of entities to update.</param>
-		void UpdateRange(IEnumerable<TEntity> entities);
+        /// <summary>
+        /// Get all entities asynchronously.
+        /// </summary>
+        /// <returns>A collection of all entities.</returns>
+        Task<IEnumerable<TEntity>> GetAllAsync();
 
-		#endregion
+        /// <summary>
+        /// Find entities based on a predicate asynchronously.
+        /// </summary>
+        /// <param name="predicate">The condition to filter entities.</param>
+        /// <returns>A collection of entities that match the predicate.</returns>
+        Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
 
-		#region 🔹 Delete
+        /// <summary>
+        /// Executes the query and returns a list of results asynchronously.
+        /// </summary>
+        /// <param name="query">The queryable object to evaluate.</param>
+        /// <returns>A list of entities from the query.</returns>
+        Task<List<TEntity>> ToListAsync(IQueryable<TEntity> query);
 
-		/// <summary>
-		/// Delete an entity.
-		/// </summary>
-		/// <param name="entity">The entity to delete.</param>
-		void Delete(TEntity entity);
+        /// <summary>
+        /// Executes a projection query and returns a list of results of type <typeparamref name="TOut"/>.
+        /// </summary>
+        /// <typeparam name="TOut">The type to project the query results into (e.g., a DTO).</typeparam>
+        /// <param name="query">The base query on the entity.</param>
+        /// <param name="selector">The projection selector used to map the entity to the output type.</param>
+        /// <returns>A list of <typeparamref name="TOut"/> results asynchronously.</returns>
+        Task<List<TOut>> ToListAsync<TOut>(IQueryable<TEntity> query, Expression<Func<TEntity, TOut>> selector);
 
-		/// <summary>
-		/// Delete multiple entities.
-		/// </summary>
-		/// <param name="entities">The collection of entities to delete.</param>
-		void DeleteRange(IEnumerable<TEntity> entities);
+        #endregion
 
-		/// <summary>
-		/// Delete entities based on a condition.
-		/// </summary>
-		/// <param name="predicate">The condition to filter entities to delete.</param>
-		void Delete(Expression<Func<TEntity, bool>> predicate);
+        #region 🔹 Update
 
-		/// <summary>
-		/// Delete an entity by its ID asynchronously.
-		/// </summary>
-		/// <param name="id">The ID of the entity to delete.</param>
-		Task DeleteByIdAsync(Guid id);
+        /// <summary>
+        /// Update an existing entity.
+        /// </summary>
+        /// <param name="entity">The entity to update.</param>
+        void Update(TEntity entity);
 
-		#endregion
+        /// <summary>
+        /// Update multiple entities.
+        /// </summary>
+        /// <param name="entities">The collection of entities to update.</param>
+        void UpdateRange(IEnumerable<TEntity> entities);
 
-		#region 🔹 Utility Methods
+        #endregion
 
-		/// <summary>
-		/// Check if any entity matches the given condition.
-		/// </summary>
-		/// <param name="predicate">The condition to check.</param>
-		Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
+        #region 🔹 Deletion
 
-		/// <summary>
-		/// Count the number of entities that match the given condition asynchronously.
-		/// </summary>
-		/// <param name="predicate">The condition to count entities.</param>
-		Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate);
+        /// <summary>
+        /// Delete an entity.
+        /// </summary>
+        /// <param name="entity">The entity to delete.</param>
+        void Delete(TEntity entity);
 
-		#endregion
+        /// <summary>
+        /// Delete multiple entities.
+        /// </summary>
+        /// <param name="entities">The collection of entities to delete.</param>
+        void DeleteRange(IEnumerable<TEntity> entities);
 
-		#region 🔹 LINQ-based Async Extensions
+        /// <summary>
+        /// Delete entities based on a condition.
+        /// </summary>
+        /// <param name="predicate">The condition to filter entities to delete.</param>
+        void Delete(Expression<Func<TEntity, bool>> predicate);
 
-		/// <summary>
-		/// Executes the query and returns a list of results asynchronously.
-		/// </summary>
-		/// <param name="query">The queryable object to evaluate.</param>
-		/// <returns>A list of entities from the query.</returns>
-		Task<List<TEntity>> ToListAsync(IQueryable<TEntity> query);
+        /// <summary>
+        /// Delete an entity by its ID asynchronously.
+        /// </summary>
+        /// <param name="id">The ID of the entity to delete.</param>
+        Task DeleteByIdAsync(Guid id);
 
-		/// <summary>
-		/// Executes a projection query and returns a list of results of type <typeparamref name="TOut"/>.
-		/// </summary>
-		/// <typeparam name="TOut">The type to project the query results into (e.g., a DTO).</typeparam>
-		/// <param name="query">The base query on the entity.</param>
-		/// <param name="selector">The projection selector used to map the entity to the output type.</param>
-		/// <returns>A list of <typeparamref name="TOut"/> results asynchronously.</returns>
-		Task<List<TOut>> ToListAsync<TOut>(IQueryable<TEntity> query, Expression<Func<TEntity, TOut>> selector);
+        #endregion
 
-		/// <summary>
-		/// Checks if any entity in the query matches the condition asynchronously.
-		/// </summary>
-		/// <param name="query">The queryable object to evaluate.</param>
-		/// <returns>True if any record matches, otherwise false.</returns>
-		Task<bool> AnyAsync(IQueryable<TEntity> query);
+        #region 🔹 Utility (Asynchronous)
 
-		/// <summary>
-		/// Returns the first element in the query or null if no elements match asynchronously.
-		/// </summary>
-		/// <param name="query">The queryable object to evaluate.</param>
-		/// <returns>The first entity if found, otherwise null.</returns>
-		Task<TEntity?> FirstOrDefaultAsync(IQueryable<TEntity> query);
+        /// <summary>
+        /// Check if any entity matches the given condition asynchronously.
+        /// </summary>
+        /// <param name="predicate">The condition to check.</param>
+        Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
 
-		/// <summary>
-		/// Includes the specified navigation property in the query.
-		/// Useful for eager-loading related entities.
-		/// </summary>
-		/// <typeparam name="TProperty">The type of the navigation property.</typeparam>
-		/// <param name="navigationPropertyPath">The expression representing the property to include.</param>
-		/// <returns>The queryable object with the navigation property included.</returns>
-		IQueryable<TEntity> Include<TProperty>(Expression<Func<TEntity, TProperty>> navigationPropertyPath);
+        /// <summary>
+        /// Check if any entity in the query matches the condition asynchronously.
+        /// </summary>
+        /// <param name="query">The queryable object to evaluate.</param>
+        /// <returns>True if any record matches, otherwise false.</returns>
+        Task<bool> AnyAsync(IQueryable<TEntity> query);
+
+        /// <summary>
+        /// Count the number of entities that match the given condition asynchronously.
+        /// </summary>
+        /// <param name="predicate">The condition to count entities.</param>
+        Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate);
+
+        /// <summary>
+        /// Counts the number of entities that match the given condition asynchronously,
+        /// after applying a projection.
+        /// </summary>
+        /// <typeparam name="TOut">The type to project the query results into.</typeparam>
+        /// <param name="query">The base query on the entity.</param>
+        /// <param name="selector">The projection selector used to map the entity to the output type.</param>
+        /// <returns>The number of projected results that match the condition asynchronously.</returns>
+        Task<int> CountAsync<TOut>(IQueryable<TEntity> query, Expression<Func<TEntity, TOut>> selector);
+
+        #endregion
+
+        #region 🔹 Eager Loading & Ordering (Query Manipulation)
+
+        /// <summary>
+        /// Includes the specified navigation property in the query.
+        /// Useful for eager-loading related entities.
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the navigation property.</typeparam>
+        /// <param name="navigationPropertyPath">The expression representing the property to include.</param>
+        /// <returns>The queryable object with the navigation property included.</returns>
+        IQueryable<TEntity> Include<TProperty>(Expression<Func<TEntity, TProperty>> navigationPropertyPath);
 
         /// <summary>
         /// Applies ordering to the query based on the provided key selector.
@@ -191,6 +214,7 @@ namespace ECOM.Domain.Interfaces.DataContracts
         /// <param name="keySelector">The expression to select the key for ordering.</param>
         /// <returns>A new queryable object with the specified descending ordering applied.</returns>
         IOrderedQueryable<TEntity> OrderByDescending<TKey>(IQueryable<TEntity> query, Expression<Func<TEntity, TKey>> keySelector);
+
         #endregion
     }
 }

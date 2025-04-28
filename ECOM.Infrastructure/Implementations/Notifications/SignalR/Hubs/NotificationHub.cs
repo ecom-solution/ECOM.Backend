@@ -5,7 +5,7 @@ using ECOM.Shared.Library.Enums.Entity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ECOM.Infrastructure.Implementations.Notifications.SignalR
+namespace ECOM.Infrastructure.Implementations.Notifications.SignalR.Hubs
 {
 	public class NotificationHub(
 		[FromKeyedServices(DatabaseConstants.Main)] IUnitOfWork mainUnitOfWork) : Hub
